@@ -1,22 +1,30 @@
-/* You can add global styles to this file, and also import other style files */
 @import 'primeicons/primeicons.css';
+
 :root {
   --font-family:
     -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Segoe UI',
     Roboto, Helvetica, Arial, sans-serif;
+}
 
-  .p-component {
-    font-family: var(--font-family);
-  }
+/* Global: alle Standard-Tags */
+html,
+body {
+  font-family: var(--font-family);
+}
 
-  .p-button.p-component {
-    background: #111 !important;
-    border-color: #111 !important;
-    color: #fff !important;
-  }
+/* PrimeNG: alle Komponenten */
+.p-component {
+  font-family: var(--font-family);
+}
 
-  .p-button.p-component:enabled:hover {
-    background: #272626 !important;
-    border-color: #000 !important;
-  }
+/* PrimeNG Buttons schwarz */
+.p-button.p-component {
+  background: #111 !important;
+  border-color: #111 !important;
+  color: #fff !important;
+}
+
+.p-button.p-component:enabled:hover {
+  background: #272626 !important;
+  border-color: #272626 !important;
 }

@@ -1,0 +1,38 @@
+<div class="settings-grid">
+    <div class="grid-cols-2">
+    <p>Latitude</p>
+    <p-inputnumber [showButtons]="true" inputId="locale-german" />
+    </div>
+    <div class="grid-cols-2">
+        <p>Longitude</p>
+        <p-inputnumber [showButtons]="true" inputId="locale-german" />
+    </div>
+    <div class="grid-cols-2">
+        <p>Radius</p>
+        <p-inputnumber [showButtons]="true" inputId="locale-german" suffix=" km"/>
+    </div>
+    <div class="grid-cols-2">
+        <p>Selection</p>
+        <p-inputnumber [showButtons]="true" inputId="locale-german" prefix="Top "/>
+    </div>
+    <div class="grid-cols-2">
+        <p>Start</p>
+        <p-datepicker view="year" [showIcon]="true" [dateFormat]="'yy'" [maxDate]="maxYearDateStart"></p-datepicker>
+    </div>
+    <div class="grid-cols-2">
+        <p>End</p>
+        <p-datepicker view="year" [showIcon]="true" [dateFormat]="'yy'" [maxDate]="maxYearDate"></p-datepicker>
+    </div>
+    <div class="grid-cols-2">
+        <p-button label="Reset"/>
+        <p-button label="Search"/>
+    </div>
+    <div class="grid-cols-2">
+        <p-button label="from Map"/>
+        <div class="grid-cols-2">
+            <p>All stations</p>
+            <p-checkbox value="New York" inputId="ny" />
+        </div>
+    </div>
+    <p-select [options]="stations" optionLabel="name" placeholder="Select a City"/>
+</div>
