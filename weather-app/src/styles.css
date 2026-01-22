@@ -1,4 +1,5 @@
 @import 'primeicons/primeicons.css';
+@import 'leaflet/dist/leaflet.css';
 
 :root {
   --font-family:
@@ -6,18 +7,19 @@
     Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Global: alle Standard-Tags */
 html,
 body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
   font-family: var(--font-family);
 }
 
-/* PrimeNG: alle Komponenten */
 .p-component {
   font-family: var(--font-family);
 }
 
-/* PrimeNG Buttons schwarz */
 .p-button.p-component {
   background: #111 !important;
   border-color: #111 !important;
@@ -27,4 +29,40 @@ body {
 .p-button.p-component:enabled:hover {
   background: #272626 !important;
   border-color: #272626 !important;
+}
+
+.station-pin,
+.station-pin * {
+  pointer-events: auto;
+}
+
+.station-pin .pin {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #111;
+  border: 3px solid #fff;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+
+.station-pin .pin::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 12px;
+  border-radius: 3px;
+  background: #111;
+}
+
+.center-pin .center-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #2f80ed;
+  border: 3px solid #fff;
+  box-shadow: 0 10px 22px rgba(47, 128, 237, 0.35);
 }

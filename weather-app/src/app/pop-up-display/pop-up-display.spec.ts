@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SettingsConfiguration } from './settings-configuration';
+import { PopUpDisplayComponent } from './pop-up-display';
 
-describe('SettingsConfiguration', () => {
-  let component: SettingsConfiguration;
-  let fixture: ComponentFixture<SettingsConfiguration>;
+describe('PopUpDisplayComponent', () => {
+  let component: PopUpDisplayComponent;
+  let fixture: ComponentFixture<PopUpDisplayComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingsConfiguration]
+      imports: [PopUpDisplayComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(SettingsConfiguration);
+    fixture = TestBed.createComponent(PopUpDisplayComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

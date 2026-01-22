@@ -1,19 +1,18 @@
-console.log('APP CONFIG LOADED');
-
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import Aura  from '@primeng/themes/aura';
-import { provideHttpClient } from '@angular/common/http';
+import Aura from '@primeng/themes/aura';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { loadingInterceptor } from './loading-screen/loading-screen-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideAnimationsAsync(),
+    provideHttpClient(withInterceptors([loadingInterceptor])),
     providePrimeNG({
       theme: {
         preset: Aura,
@@ -22,6 +21,5 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
-    provideHttpClient()
   ]
 };

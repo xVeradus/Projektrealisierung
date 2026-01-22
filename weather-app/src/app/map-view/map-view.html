@@ -1,0 +1,15 @@
+<div class="map-wrapper">
+    <div #mapEl class="map" (dragover)="onDragOver($event)" (drop)="onDrop($event)" aria-label="Interaktive Wetterkarte"
+        role="application"></div>
+
+    <div class="draggable-pin" draggable="true" (dragstart)="onDragStart($event)" title="Ziehe mich auf die Karte"
+        role="button" aria-label="Such-Pin auf Karte ziehen">
+        <div class="pin-icon" aria-hidden="true"></div>
+        <span class="pin-label">Auf Karte ziehen</span>
+    </div>
+
+    <img #dragImage
+        src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiNlZjQ0NDQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDJDOC4xMyAyIDUgNS4xMyA1IDljMCA1LjI1IDcgMTMgNyAxM3M3LTcuNzUgNy0xM2MwLTMuODctMy4xMy03LTctN3ptMCA5LjVjLTEuMzggMC0yLjUtMS4xMi0yLjUtMi41czEuMTItMi41IDIuNS0yLjUgMi41IDEuMTIgMi41IDIuNS0xLjEyIDIuNS0yLjUgMi41eiIvPjwvc3ZnPg=="
+        style="position: absolute; top: -1000px; left: -1000px; width: 48px; height: 48px; z-index: -1;"
+        alt="Dragging Pin">
+</div>

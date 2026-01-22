@@ -1,15 +1,25 @@
-<div class="container">
-    <div class="border settings">
-        <app-settings></app-settings>
+<header class="app-banner">
+  <div class="brand">
+    <div class="brand-text">
+      <h1 class="app-name">Lost im Wetterarchiv</h1>
+      <p class="subtitle">Das Wetter von damals – wie wir: instabil.</p>
     </div>
+  </div>
+  <div class="action-title">
+    „{{ currentQuote() }}“
+  </div>
+</header>
 
-    <main class="border content">
-        <div class="border pane chart">
-            <app-graph></app-graph>
-        </div>
+<div class="dv">
+  <div class="settings">
+    <app-settings-configuration></app-settings-configuration>
+  </div>
 
-        <div class="border pane table">
-            <app-table></app-table>
-        </div>
-    </main>
+  <div class="map-pane">
+    <app-map-view></app-map-view>
+  </div>
 </div>
+
+<pop-up-display [visible]="ui.dialogVisible()" (visibleChange)="onDialogVisibleChange($event)"
+  [stationId]="ui.selectedStationId()">
+</pop-up-display>

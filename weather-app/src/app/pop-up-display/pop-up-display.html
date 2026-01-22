@@ -1,0 +1,59 @@
+<p-dialog [header]="'Station: ' + (stationName ?? '')" [visible]="visible" (visibleChange)="onVisibleChange($event)"
+  [modal]="true" [dismissableMask]="true" [appendTo]="'body'" [baseZIndex]="10000"
+  [style]="{ width: '90vw', maxWidth: '1200px' }" [contentStyle]="{ height: '80vh', overflow: 'hidden' }"
+  (onShow)="onShow()" closeAriaLabel="Schließen">
+  <div *ngIf="!loading && rowsCache.length > 0"
+    style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px; flex-wrap: wrap;">
+    <p-select [options]="periodOptions" optionLabel="label" optionValue="value" [(ngModel)]="period"
+      [ngModelOptions]="{ standalone: true }" (onChange)="onPeriodChange()" placeholder="Period"
+      style="min-width: 140px;" ariaLabel="Zeitraum auswählen"></p-select>
+
+    <div style="flex-grow: 1; display: flex; align-items: center; gap: 16px; min-width: 300px; padding: 0 10px;">
+      <p-inputNumber [(ngModel)]="currentRange.start" [showButtons]="false" (onBlur)="onInputYearChange()"
+        (onKeyDown.enter)="onInputYearChange()" [min]="minYear" [max]="currentRange.end" inputStyleClass="year-input"
+        placeholder="Start" [useGrouping]="false" ariaLabel="Startjahr"></p-inputNumber>
+
+      <div style="flex-grow: 1; padding: 0 8px;">
+        <p-slider [(ngModel)]="selectedRange" [range]="true" [min]="minYear" [max]="maxYear"
+          (onChange)="onRangeChange()" styleClass="w-full" ariaLabel="Year range"></p-slider>
+      </div>
+
+      <p-inputNumber [(ngModel)]="currentRange.end" [showButtons]="false" (onBlur)="onInputYearChange()"
+        (onKeyDown.enter)="onInputYearChange()" [min]="currentRange.start" [max]="maxYear" inputStyleClass="year-input"
+        placeholder="End" [useGrouping]="false" ariaLabel="Endjahr"></p-inputNumber>
+    </div>
+
+    <div class="legend-chips-row">
+      <button class="legend-chip" [class.inactive]="!showTmax" (click)="showTmax = !showTmax; onToggleDataset()"
+        type="button" [attr.aria-pressed]="showTmax" aria-label="Maximaltemperatur anzeigen">
+        <span class="dot tmax"></span>
+        <span class="chip-label">Avg Tmax</span>
+      </button>
+
+      <button class="legend-chip" [class.inactive]="!showTmin" (click)="showTmin = !showTmin; onToggleDataset()"
+        type="button" [attr.aria-pressed]="showTmin" aria-label="Minimaltemperatur anzeigen">
+        <span class="dot tmin"></span>
+        <span class="chip-label">Avg Tmin</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && rowsCache.length === 0 && !error" class="state-container">
+    <div class="empty-state-card">
+      <span style="font-size: 3.5rem; margin-bottom: 1rem;" role="img" aria-label="Wetterwolke">☁️</span>
+      <h3>Keine Daten verfügbar</h3>
+      <p class="state-text">Für diesen Zeitraum liegen keine Wetterdaten vor.</p>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="state-container error">
+    <i class="pi pi-exclamation-circle" style="font-size: 3rem;"></i>
+    <h3>Fehler</h3>
+    <p class="state-text">{{ error }}</p>
+  </div>
+
+  <div style="height: calc(100% - 100px); width: 100%" *ngIf="!loading && rowsCache.length > 0 && chartData">
+    <p-chart type="line" [data]="chartData" [options]="chartOptions" [plugins]="[crosshairPlugin]"
+      height="100%"></p-chart>
+  </div>
+</p-dialog>

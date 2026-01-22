@@ -1,0 +1,24 @@
+services:
+  weather_api:
+    build:
+      context: ./weather-app-backend
+      dockerfile: Dockerfile
+    container_name: weather_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./weather-app-backend/weather.sqlite3:/app/weather.sqlite3
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200,http://localhost:8080
+    restart: unless-stopped
+
+  weather_app:
+    build:
+      context: ./weather-app
+      dockerfile: Dockerfile
+    container_name: weather_app
+    ports:
+      - "8080:80"
+    depends_on:
+      - weather_api
+    restart: unless-stopped

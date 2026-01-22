@@ -1,18 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MapViewComponent } from './map-view';
 
-import { SettingsToggle } from './settings-toggle';
-
-describe('SettingsToggle', () => {
-  let component: SettingsToggle;
-  let fixture: ComponentFixture<SettingsToggle>;
-
+describe('MapView', () => {
+  let component: MapViewComponent;
+  let fixture: ComponentFixture<MapViewComponent>;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingsToggle]
+      imports: [MapViewComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(SettingsToggle);
+    fixture = TestBed.createComponent(MapViewComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

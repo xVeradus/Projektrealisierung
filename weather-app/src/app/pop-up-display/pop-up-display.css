@@ -1,0 +1,127 @@
+.year-input {
+    width: 70px !important;
+    text-align: center;
+    padding: 6px 4px !important;
+    font-size: 14px;
+}
+
+.legend-chips-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 0 10px;
+}
+
+.legend-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: white;
+    margin: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.legend-chip:hover {
+    background: rgba(0, 0, 0, 0.02);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.legend-chip.inactive {
+    opacity: 0.5;
+    background: #f9fafb;
+    border-style: dashed;
+    box-shadow: none;
+    transform: none;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot.tmax {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+.dot.tmin {
+    background: #3b82f6;
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
+}
+
+.chip-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+    text-align: center;
+    gap: 16px;
+    color: #64748b;
+    margin-top: 40px;
+}
+
+.state-container h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.state-text {
+    max-width: 300px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.empty-state-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: rgba(243, 244, 246, 0.5);
+    border-radius: 24px;
+    border: 1px dashed #d1d5db;
+    max-width: 400px;
+    width: 100%;
+}
+
+.empty-state-card i {
+    opacity: 0.8;
+}
+
+.state-container.error i {
+    background: #ef4444;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.p-dialog .p-dialog-content {
+    overflow: hidden !important;
+}
+
+.p-dialog-mask {
+    overflow: hidden !important;
+}
