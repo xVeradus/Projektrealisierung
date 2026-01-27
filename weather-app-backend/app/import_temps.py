@@ -280,17 +280,17 @@ def fetch_and_parse_station_periods(
         df = _load_s3_data(station_id, start_year, end_year, ignore_qflag)
         if not df.empty:
             elapsed = time.time() - start_t
-            logging.info(f"AWS Loading Time: {elapsed:.2f}s")
+            print(f"AWS Loading Time: {elapsed:.2f}s")
             return _process_weather_data(df, start_year, end_year)
-        logging.warning("S3 data empty, falling back...")
+        print("S3 data empty, falling back...")
     except Exception as e:
-        logging.warning(f"S3 fetch failed ({e}), falling back to NCEI DLY...")
+        print(f"S3 fetch failed ({e}), falling back to NCEI DLY...")
 
     # TIER 2: Fallback to NCEI (DLY)
     start_t = time.time()
     df = _load_dly_data(station_id, start_year, end_year, ignore_qflag)
     elapsed = time.time() - start_t
-    logging.info(f"NCEI Loading Time: {elapsed:.2f}s")
+    print(f"NCEI Loading Time: {elapsed:.2f}s")
     return _process_weather_data(df, start_year, end_year)
 
 

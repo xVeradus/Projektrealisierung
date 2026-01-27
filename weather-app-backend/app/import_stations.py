@@ -6,8 +6,6 @@ import requests
 import logging
 import time
 
-logging.basicConfig(level=logging.INFO)
-
 STATIONS_URL = "https://noaa-ghcn-pds.s3.amazonaws.com/ghcnd-stations.txt"
 NOA_STATIONS_URL = "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt"
 
@@ -33,9 +31,9 @@ def main():
 def download_file(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists() and dest.stat().st_size > 0:
-        logging.info(f"File {dest} already exists, skipping download.")
+        print(f"File {dest} already exists, skipping download.")
         return
-    logging.info(f"Downloading {url} to {dest}...")
+    print(f"Downloading {url} to {dest}...")
     start_t = time.time()
     try:
         with requests.get(url, stream=True, timeout=30) as r:
@@ -46,9 +44,9 @@ def download_file(url: str, dest: Path) -> None:
                         f.write(chunk)
         elapsed = time.time() - start_t
         size_mb = dest.stat().st_size / (1024 * 1024)
-        logging.info(f"[OK] Downloaded {dest} in {elapsed:.2f}s (Size: {size_mb:.2f} MB).")
+        print(f"[OK] Downloaded {dest} in {elapsed:.2f}s (Size: {size_mb:.2f} MB).")
     except Exception as e:
-        logging.error(f"Download failed for {url}: {e}")
+        print(f"Download failed for {url}: {e}")
         raise e
 
 
@@ -88,7 +86,7 @@ def parse_station_line(line: str) -> dict:
 
 
 def import_stations(conn: sqlite3.Connection, stations_txt: Path) -> None:
-    logging.info(f"Importing stations from {stations_txt}...")
+    print(f"Importing stations from {stations_txt}...")
 
     insert_sql = """
     INSERT OR REPLACE INTO stations (
@@ -136,14 +134,14 @@ def import_stations(conn: sqlite3.Connection, stations_txt: Path) -> None:
         print(f"  Inserted {count} stations...", end="\r")
 
     conn.commit()
-    logging.info(f"[OK] Imported {count} stations.")
+    print(f"[OK] Imported {count} stations.")
 
 
 def ensure_stations_imported() -> dict:
-    logging.info(f"BASE_DIR: {BASE_DIR}")
-    logging.info(f"DATA_DIR: {DATA_DIR}")
-    logging.info(f"STATIONS_TXT: {STATIONS_TXT}")
-    logging.info(f"DB_PATH: {DB_PATH}")
+    print(f"BASE_DIR: {BASE_DIR}")
+    print(f"DATA_DIR: {DATA_DIR}")
+    print(f"STATIONS_TXT: {STATIONS_TXT}")
+    print(f"DB_PATH: {DB_PATH}")
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -160,7 +158,7 @@ def ensure_stations_imported() -> dict:
         try:
             download_file(STATIONS_URL, STATIONS_TXT)
         except Exception as e:
-            logging.warning(f"Primary URL failed: {e}. Trying fallback...")
+            print(f"Primary URL failed: {e}. Trying fallback...")
             download_file(NOA_STATIONS_URL, STATIONS_TXT)
         import_stations(conn, STATIONS_TXT)
 

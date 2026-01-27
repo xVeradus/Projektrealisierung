@@ -27,8 +27,6 @@ app = FastAPI(title="Weather Data API", version="0.1.0")
 # 1. Gzip Compression (optimizes bandwidth)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-logging.basicConfig(level=logging.INFO)
-
 @app.on_event("startup")
 async def startup_event():
     app.state.stations_ready = False
@@ -139,7 +137,7 @@ def station_temps(
         
         if rows:
             elapsed = time.time() - start_t
-            logging.info(f"[API] Serving {len(rows)} rows from DB cache (Time: {elapsed:.2f}s)")
+            print(f"[API] Serving {len(rows)} rows from DB cache (Time: {elapsed:.2f}s)")
             return rows
 
         # If no data in DB, fetch live, return immediately, save in background
