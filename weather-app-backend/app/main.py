@@ -29,6 +29,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 @app.on_event("startup")
 async def startup_event():
+    print("--- BACKEND VERSION 2.0 (DEBUG) ---", flush=True)
     app.state.stations_ready = False
     app.state.stations_error = None
     app.state.stations_info = None

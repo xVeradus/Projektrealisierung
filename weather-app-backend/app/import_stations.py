@@ -31,9 +31,9 @@ def main():
 def download_file(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists() and dest.stat().st_size > 0:
-        print(f"File {dest} already exists, skipping download.")
+        print(f"File {dest} already exists, skipping download.", flush=True)
         return
-    print(f"Downloading {url} to {dest}...")
+    print(f"Downloading {url} to {dest}...", flush=True)
     start_t = time.time()
     try:
         with requests.get(url, stream=True, timeout=30) as r:
@@ -44,9 +44,9 @@ def download_file(url: str, dest: Path) -> None:
                         f.write(chunk)
         elapsed = time.time() - start_t
         size_mb = dest.stat().st_size / (1024 * 1024)
-        print(f"[OK] Downloaded {dest} in {elapsed:.2f}s (Size: {size_mb:.2f} MB).")
+        print(f"[OK] Downloaded {dest} in {elapsed:.2f}s (Size: {size_mb:.2f} MB).", flush=True)
     except Exception as e:
-        print(f"Download failed for {url}: {e}")
+        print(f"Download failed for {url}: {e}", flush=True)
         raise e
 
 
@@ -86,7 +86,7 @@ def parse_station_line(line: str) -> dict:
 
 
 def import_stations(conn: sqlite3.Connection, stations_txt: Path) -> None:
-    print(f"Importing stations from {stations_txt}...")
+    print(f"Importing stations from {stations_txt}...", flush=True)
 
     insert_sql = """
     INSERT OR REPLACE INTO stations (
@@ -125,23 +125,23 @@ def import_stations(conn: sqlite3.Connection, stations_txt: Path) -> None:
             if len(batch) >= 1000:
                 cursor.executemany(insert_sql, batch)
                 count += len(batch)
-                print(f"  Inserted {count} stations...", end="\r")
+                print(f"  Inserted {count} stations...", end="\r", flush=True)
                 batch = []
 
     if batch:
         cursor.executemany(insert_sql, batch)
         count += len(batch)
-        print(f"  Inserted {count} stations...", end="\r")
+        print(f"  Inserted {count} stations...", end="\r", flush=True)
 
     conn.commit()
-    print(f"[OK] Imported {count} stations.")
+    print(f"[OK] Imported {count} stations.", flush=True)
 
 
 def ensure_stations_imported() -> dict:
-    print(f"BASE_DIR: {BASE_DIR}")
-    print(f"DATA_DIR: {DATA_DIR}")
-    print(f"STATIONS_TXT: {STATIONS_TXT}")
-    print(f"DB_PATH: {DB_PATH}")
+    print(f"BASE_DIR: {BASE_DIR}", flush=True)
+    print(f"DATA_DIR: {DATA_DIR}", flush=True)
+    print(f"STATIONS_TXT: {STATIONS_TXT}", flush=True)
+    print(f"DB_PATH: {DB_PATH}", flush=True)
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -158,7 +158,7 @@ def ensure_stations_imported() -> dict:
         try:
             download_file(STATIONS_URL, STATIONS_TXT)
         except Exception as e:
-            print(f"Primary URL failed: {e}. Trying fallback...")
+            print(f"Primary URL failed: {e}. Trying fallback...", flush=True)
             download_file(NOA_STATIONS_URL, STATIONS_TXT)
         import_stations(conn, STATIONS_TXT)
 
