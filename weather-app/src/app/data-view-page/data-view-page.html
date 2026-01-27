@@ -1,13 +1,13 @@
 <header class="app-banner">
   <div class="brand">
     <div class="brand-text">
-      <h1 class="app-name">Lost im Wetterarchiv</h1>
-      <p class="subtitle">Das Wetter von damals – wie wir: instabil.</p>
+      <h1 class="app-name">Wetterarchiv</h1>
+      <!-- <p class="subtitle">Das Wetter von damals – wie wir: instabil.</p> -->
     </div>
   </div>
-  <div class="action-title">
+  <!--<div class="action-title">
     „{{ currentQuote() }}“
-  </div>
+  </div> -->
 </header>
 
 <div class="dv">
@@ -21,5 +21,17 @@
 </div>
 
 <pop-up-display [visible]="ui.dialogVisible()" (visibleChange)="onDialogVisibleChange($event)"
-  [stationId]="ui.selectedStationId()">
+  [stationId]="ui.selectedStationId()" [initialRange]="ui.yearRange()">
 </pop-up-display>
+
+<footer class="doc-footer">
+  <div class="footer-credits">
+    <i class="pi pi-coffee" style="margin-right: 8px; color: #64748b"></i>
+    Made with lots of coffee and tears by: Lisa Fritsch, Jan Goliasch, Finja Sterner and Menko
+    Hornstein
+  </div>
+  <a href="http://localhost:8001" target="_blank" class="doc-link">
+    <i class="pi pi-book"></i>
+    Dokumentation öffnen
+  </a>
+</footer>

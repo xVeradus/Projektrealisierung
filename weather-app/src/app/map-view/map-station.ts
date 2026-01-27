@@ -9,9 +9,14 @@ export class StationUiStateService {
   readonly stations = signal<StationItem[]>([]);
   readonly selectedStationId = signal<string | null>(null);
   readonly dialogVisible = signal<boolean>(false);
+  readonly yearRange = signal<[number, number] | null>(null);
 
   setCenter(lat: number, lon: number, radius_km?: number): void {
     this.center.set({ lat, lon, radius_km });
+  }
+
+  setYearRange(range: [number, number] | null): void {
+    this.yearRange.set(range);
   }
 
   setStations(stations: StationItem[]): void {

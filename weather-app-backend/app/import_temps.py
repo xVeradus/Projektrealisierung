@@ -61,49 +61,200 @@ def season_name(month: int) -> str:
     return "winter"
 
 
-def import_station_periods(
+import pandas as pd
+import numpy as np
+
+def fetch_and_parse_station_periods(
     station_id: str,
-    conn: sqlite3.Connection,
     ignore_qflag: bool = True,
     start_year: Optional[int] = None,
     end_year: Optional[int] = None,
-) -> None:
-
+) -> List[Tuple]:
+    """
+    Downloads and parses .dly file effectively in-memory using Pandas.
+    Returns list of tuples ready for DB insertion:
+      (station_id, year, period, avg_tmax_c, avg_tmin_c, n_tmax, n_tmin)
+    """
     dly_path = DATA_DIR / f"{station_id}.dly"
     download_dly(station_id, dly_path)
 
-    buckets: Dict[Tuple[int, str], Agg] = {}
+    # Define fixed widths for .dly format
+    # ID(11), YEAR(4), MONTH(2), ELEMENT(4)
+    # Then 31 days of: VALUE(5), MFLAG(1), QFLAG(1), SFLAG(1)
+    
+    # We only care about VALUE and QFLAG.
+    # We will read everything and filter columns later or define widths intelligently.
+    # To keep it simple for read_fwf, we define strictly.
+    
+    colspecs = [(0, 11), (11, 15), (15, 17), (17, 21)]
+    names = ["station_id", "year", "month", "element"]
+    
+    for i in range(1, 32):
+        start = 21 + (i - 1) * 8
+        colspecs.append((start, start + 5))      # Value
+        colspecs.append((start + 6, start + 7))  # QFlag
+        names.append(f"v{i}")
+        names.append(f"q{i}")
 
-    def bucket(y: int, p: str) -> Agg:
-        return buckets.setdefault((y, p), Agg())
+    try:
+        # Read file with Pandas
+        df = pd.read_fwf(
+            dly_path, 
+            colspecs=colspecs, 
+            names=names, 
+            header=None,
+            dtype={"station_id": str, "year": int, "month": int, "element": str}
+        )
+    except Exception as e:
+        print(f"Error reading {dly_path}: {e}")
+        return []
 
-    with open(dly_path, "r", encoding="utf-8", errors="replace") as f:
-        for y, m, element, value, qflag in iter_dly_values(f):
-            if value == MISSING:
-                continue
-            if ignore_qflag and qflag.strip():
-                continue
+    if df.empty:
+        return []
 
-            if start_year is not None and y < start_year - 1:
-                continue
-            if end_year is not None and y > end_year:
-                continue
+    # Filter year range early
+    if start_year:
+        df = df[df["year"] >= start_year]
+    if end_year:
+        df = df[df["year"] <= end_year]
 
-            v_c = value / 10.0
+    # Filter Elements
+    df = df[df["element"].isin(["TMAX", "TMIN"])]
 
-            if (start_year is None or y >= start_year) and (end_year is None or y <= end_year):
-                bucket(y, "annual").add(element, v_c)
+    # Melt to long format
+    # We need to melt Values and QFlags separately and join, or melt all and parse.
+    # Easier: Melt twice.
+    
+    id_vars = ["station_id", "year", "month", "element"]
+    
+    # Value Melt
+    val_vars = [f"v{i}" for i in range(1, 32)]
+    df_v = df.melt(id_vars=id_vars, value_vars=val_vars, var_name="day_raw", value_name="value")
+    
+    # QFlag Melt
+    q_vars = [f"q{i}" for i in range(1, 32)]
+    df_q = df.melt(id_vars=id_vars, value_vars=q_vars, var_name="day_q_raw", value_name="qflag")
+    
+    # Assign qflag to df_v (trusting sort order is identical due to melt behavior)
+    # They have same index/length. 
+    df_v["qflag"] = df_q["qflag"]
 
-            p = season_name(m)
-            sy = season_year(y, m)
-            if (start_year is None or sy >= start_year) and (end_year is None or sy <= end_year):
-                bucket(sy, p).add(element, v_c)
+    # Filter missing values (-9999)
+    df_v = df_v[df_v["value"] != MISSING]
+    
+    # Filter QFlags
+    if ignore_qflag:
+        # Keep only rows where qflag is NaN or empty whitespace
+        # read_fwf reads spaces as NaN by default usually, or empty string.
+        # Let's be safe.
+        mask_valid = df_v["qflag"].isna() | (df_v["qflag"].astype(str).str.strip() == "")
+        df_v = df_v[mask_valid]
 
-    rows: List[Tuple] = []
-    for (year, period), a in buckets.items():
-        rows.append((station_id, year, period, a.avg_tmax(),
-                    a.avg_tmin(), a.n_tmax, a.n_tmin))
+    if df_v.empty:
+        return []
 
+    # Convert to Celsius
+    df_v["value"] = df_v["value"] / 10.0
+
+    # Determine Season
+    # Spring: 3,4,5; Summer: 6,7,8; Autumn: 9,10,11; Winter: 12,1,2
+    # Season Year: Dec 2020 -> Winter 2021
+    
+    df_v["season"] = df_v["month"].map({
+        3: "spring", 4: "spring", 5: "spring",
+        6: "summer", 7: "summer", 8: "summer",
+        9: "autumn", 10: "autumn", 11: "autumn",
+        12: "winter", 1: "winter", 2: "winter"
+    })
+    
+    df_v["season_year"] = df_v["year"]
+    df_v.loc[df_v["month"] == 12, "season_year"] += 1
+
+    # Aggregation
+    
+    # 1. Annual Stats
+    grp_annual = df_v.groupby(["station_id", "year", "element"])["value"].agg(["mean", "count"])
+    grp_annual = grp_annual.unstack("element") # pivot TMAX/TMIN to columns
+    # resulting cols: (mean, TMAX), (mean, TMIN), (count, TMAX), (count, TMIN)
+    
+    # Flatten columns
+    grp_annual.columns = [f"{x}_{y}" for x, y in grp_annual.columns]
+    grp_annual = grp_annual.reset_index()
+    grp_annual["period"] = "annual"
+    
+    # 2. Seasonal Stats
+    grp_seasonal = df_v.groupby(["station_id", "season_year", "season", "element"])["value"].agg(["mean", "count"])
+    grp_seasonal = grp_seasonal.unstack("element")
+    grp_seasonal.columns = [f"{x}_{y}" for x, y in grp_seasonal.columns]
+    grp_seasonal = grp_seasonal.reset_index()
+    grp_seasonal = grp_seasonal.rename(columns={"season_year": "year", "season": "period"}) # match output schema
+    
+    # Combine
+    final_df = pd.concat([grp_annual, grp_seasonal], ignore_index=True)
+    
+    # Ensure all columns exist (in case TMIN or TMAX is missing entirely)
+    expected_cols = ["mean_TMAX", "mean_TMIN", "count_TMAX", "count_TMIN"]
+    for c in expected_cols:
+        if c not in final_df.columns:
+            final_df[c] = np.nan
+            
+    # Fill NaN counts with 0 (if TMAX exists but TMIN doesn't, count_TMIN is NaN -> 0)
+    final_df["count_TMAX"] = final_df["count_TMAX"].fillna(0).astype(int)
+    final_df["count_TMIN"] = final_df["count_TMIN"].fillna(0).astype(int)
+    
+    # Output format: (station_id, year, period, avg_tmax_c, avg_tmin_c, n_tmax, n_tmin)
+    # Be careful with None/NaN for floats in SQLite.
+    
+    results = []
+    
+    # Optimize loop or use to_dict
+    recs = final_df.to_dict(orient="records")
+    
+    def clean_val(v):
+        try:
+            f = float(v)
+            if np.isnan(f) or np.isinf(f):
+                return None
+            return f
+        except (ValueError, TypeError):
+            return None
+
+    for r in recs:
+        # Filter range again for season_year shift? 
+        y = r["year"]
+        if start_year and y < start_year: continue
+        if end_year and y > end_year: continue
+        
+        results.append((
+            r["station_id"],
+            int(r["year"]),
+            r["period"],
+            clean_val(r.get("mean_TMAX")),
+            clean_val(r.get("mean_TMIN")),
+            int(r.get("count_TMAX", 0)),
+            int(r.get("count_TMIN", 0)),
+        ))
+    
+    import json
+    for i, row in enumerate(results):
+        try:
+            json.dumps(row[3], allow_nan=False)
+            json.dumps(row[4], allow_nan=False)
+        except (ValueError, TypeError) as e:
+            print(f"JSON COMPLIANCE FAILURE [index {i}]: {row[3]}, {row[4]} ERROR: {e}")
+            lst = list(row)
+            lst[3] = None
+            lst[4] = None
+            results[i] = tuple(lst)
+            
+    return results
+
+
+def save_station_periods_to_db(conn: sqlite3.Connection, rows: List[Tuple]) -> None:
+    """
+    Persists the parsed rows into the database.
+    This can be called in a background task.
+    """
     conn.executemany(
         """
         INSERT OR REPLACE INTO station_temp_period
@@ -113,6 +264,22 @@ def import_station_periods(
         rows,
     )
     conn.commit()
+
+
+def import_station_periods(
+    station_id: str,
+    conn: sqlite3.Connection,
+    ignore_qflag: bool = True,
+    start_year: Optional[int] = None,
+    end_year: Optional[int] = None,
+) -> None:
+    """
+    Synchronous wrapper for backward compatibility or bulk imports.
+    """
+    rows = fetch_and_parse_station_periods(
+        station_id, ignore_qflag, start_year, end_year
+    )
+    save_station_periods_to_db(conn, rows)
 
 
 def _years_to_blocks(years: List[int]) -> List[Tuple[int, int]]:

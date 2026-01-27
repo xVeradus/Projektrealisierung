@@ -45,6 +45,24 @@
           <p-slider formControlName="limit" [min]="1" [max]="100" styleClass="w-full"
             ariaLabel="Results limit"></p-slider>
         </div>
+
+        <div class="slider-item" *ngIf="!form.get('show_all')?.value">
+          <div class="slider-header" style="margin-bottom: 8px;">
+            <label style="margin: 0;">Data Year Range</label>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <p-inputnumber formControlName="start_year" [min]="1900" [max]="2025" [useGrouping]="false"
+              inputStyleClass="year-input-small" [showButtons]="false"></p-inputnumber>
+
+            <div style="flex-grow: 1; padding-top: 6px;">
+              <p-slider formControlName="year_range" [range]="true" [min]="1900" [max]="2025" styleClass="w-full"
+                ariaLabel="Data availability year range"></p-slider>
+            </div>
+
+            <p-inputnumber formControlName="end_year" [min]="1900" [max]="2025" [useGrouping]="false"
+              inputStyleClass="year-input-small" [showButtons]="false"></p-inputnumber>
+          </div>
+        </div>
       </div>
     </div>
 

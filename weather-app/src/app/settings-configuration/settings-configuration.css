@@ -201,3 +201,10 @@ main {
   font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
   letter-spacing: -0.2px;
 }
+
+.year-input-small {
+  width: 70px !important;
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+  text-align: center;
+}

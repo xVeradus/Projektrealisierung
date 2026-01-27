@@ -65,6 +65,8 @@ def find_stations_nearby(
     radius_km: float,
     limit: int = 25,
     db_path: Union[str, Path] = DB_PATH,
+    start_year: Optional[int] = None,
+    end_year: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     if radius_km <= 0:
         return []
@@ -76,14 +78,26 @@ def find_stations_nearby(
 
     min_lat, max_lat, min_lon, max_lon = bounding_box(lat, lon, radius_km)
     
+    # Basic bounding box query
     sql = """
-    SELECT station_id, name, lat, lon
-    FROM stations
-    WHERE lat BETWEEN ? AND ?
-      AND lon BETWEEN ? AND ?
+    SELECT s.station_id, s.name, s.lat, s.lon
+    FROM stations s
+    WHERE s.lat BETWEEN ? AND ?
+      AND s.lon BETWEEN ? AND ?
     """
     params = [min_lat, max_lat, min_lon, max_lon]
 
+    # If year filtering is requested, check existence of data in range
+    if start_year is not None and end_year is not None:
+        sql += """
+        AND EXISTS (
+             SELECT 1 FROM station_temp_period p
+             WHERE p.station_id = s.station_id
+               AND p.year >= ? AND p.year <= ?
+        )
+        """
+        params.extend([start_year, end_year])
+    
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     try:

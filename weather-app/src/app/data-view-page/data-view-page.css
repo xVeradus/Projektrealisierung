@@ -73,3 +73,40 @@
   overflow: hidden;
   border-radius: 14px;
 }
+
+.doc-footer {
+  height: 44px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.footer-credits {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.doc-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.doc-link:hover {
+  color: #4f46e5;
+  background: #f1f5f9;
+}

@@ -1,0 +1,83 @@
+site_name: Weather App Documentation
+site_description: Historical weather data exploration and analysis tool.
+site_author: xVeradus
+
+theme:
+  name: material
+  language: de
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  custom_dir: overrides
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+    - toc.integrate
+  
+extra:
+  social:
+    - icon: material/coffee
+      link: "#"
+      name: Made with coffee
+    - icon: material/water
+      link: "#"
+      name: and tears
+  credits: "Made with a lot of coffee and tears by Lisa Fritsch, Jan Goliasch, Finja Sterner and Menko Hornstein"
+  app_url: "http://localhost:8080"
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - pymdownx.magiclink
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - toc:
+      permalink: true
+
+nav:
+  - Welcome: index.md
+  - Architecture: architecture.md
+  - Details:
+    - Backend: backend.md
+    - Frontend: frontend.md
+  - Installation: setup.md
+  - 🏠 Zurück zur App: http://localhost:8080

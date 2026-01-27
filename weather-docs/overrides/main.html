@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block announce %}
+<div style="background: rgba(0,0,0,0.2); padding: 0.5rem; text-align: center; font-weight: bold;">
+    <a href="{{ config.extra.app_url }}"
+        style="color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+        <span class="twemoji" style="width: 20px; height: 20px;">{% include ".icons/material/arrow-left.svg" %}</span>
+        Zurück zur Hauptanwendung
+    </a>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+{{ super() }}
+<style>
+    .md-header__button.md-logo img {
+        height: 2.0rem;
+        width: auto;
+    }
+</style>
+{% endblock %}

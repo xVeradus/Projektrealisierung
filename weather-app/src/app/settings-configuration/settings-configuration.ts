@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, effect, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, FormGroup, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -17,7 +17,7 @@ import { StationUiStateService } from '../map-view/map-station';
 @Component({
   selector: 'app-settings-configuration',
   standalone: true,
-  imports: [CommonModule, InputNumberModule, DatePickerModule, ButtonModule, ReactiveFormsModule, SliderModule, ToggleSwitchModule, TooltipModule],
+  imports: [CommonModule, InputNumberModule, DatePickerModule, ButtonModule, ReactiveFormsModule, FormsModule, SliderModule, ToggleSwitchModule, TooltipModule],
   templateUrl: './settings-configuration.html',
   styleUrl: './settings-configuration.css',
   encapsulation: ViewEncapsulation.None,
@@ -41,7 +41,49 @@ export class SettingsConfiguration {
       limit: this.fb.control<number>(25, Validators.required),
       show_all: this.fb.control<boolean>(true),
       station_id: this.fb.control<string | null>(null),
+      year_range: this.fb.control<number[]>([1950, 2025]),
+      start_year: this.fb.control<number>(1950),
+      end_year: this.fb.control<number>(2025),
     });
+
+    // Sync Slider -> Inputs
+    this.form.get('year_range')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((range: number[]) => {
+        if (range && range.length === 2) {
+          this.form.patchValue({
+            start_year: range[0],
+            end_year: range[1]
+          }, { emitEvent: false });
+        }
+      });
+
+    // Sync Inputs -> Slider
+    const syncSliderFromInputs = () => {
+      const start = this.form.get('start_year')?.value;
+      const end = this.form.get('end_year')?.value;
+      if (start !== null && end !== null) {
+        // Ensure valid range
+        let newStart = start;
+        let newEnd = end;
+        if (newStart > newEnd) {
+          // If start is greater, we don't force fix immediately to allow typing, 
+          // but slider might look weird. 
+          // Better to let slider clamp or just update. 
+          // Let's just update, slider handles it or we fix it.
+          // Actually, let's keep it simple.
+        }
+        this.form.patchValue({ year_range: [newStart, newEnd] }, { emitEvent: false });
+      }
+    };
+
+    this.form.get('start_year')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(syncSliderFromInputs);
+
+    this.form.get('end_year')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(syncSliderFromInputs);
 
     effect(() => {
       const id = this.ui.selectedStationId();
@@ -98,11 +140,20 @@ export class SettingsConfiguration {
     const v = this.form.getRawValue() as any;
     this.ui.setCenter(v.lat, v.lon, v.radius_km);
 
+    // Sync year range to UI state for popups
+    if (!v.show_all && v.year_range) {
+      this.ui.setYearRange([v.year_range[0], v.year_range[1]]);
+    } else {
+      this.ui.setYearRange(null);
+    }
+
     const req: StationSearchRequest = {
       lat: v.lat,
       lon: v.lon,
       radius_km: v.radius_km,
       limit: v.show_all ? 1000 : (v.limit ?? 25),
+      start_year: (!v.show_all && v.year_range) ? v.year_range[0] : undefined,
+      end_year: (!v.show_all && v.year_range) ? v.year_range[1] : undefined,
     };
 
     this.api.searchStations(req).subscribe({
@@ -117,6 +168,8 @@ export class SettingsConfiguration {
     });
   }
 
+
+
   reset(): void {
     this.form.reset({
       lat: 48.0636,
@@ -125,6 +178,9 @@ export class SettingsConfiguration {
       limit: 25,
       show_all: true,
       station_id: null,
+      year_range: [1950, 2025],
+      start_year: 1950,
+      end_year: 2025,
     });
 
     this.stations = [];

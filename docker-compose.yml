@@ -7,7 +7,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./weather-app-backend/weather.sqlite3:/app/weather.sqlite3
+      - ./weather-app-backend:/app
     environment:
       - ALLOWED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200,http://localhost:8080
     restart: unless-stopped
@@ -21,4 +21,13 @@ services:
       - "8080:80"
     depends_on:
       - weather_api
+    restart: unless-stopped
+
+  weather_docs:
+    image: squidfunk/mkdocs-material
+    container_name: weather_docs
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./weather-docs:/docs
     restart: unless-stopped

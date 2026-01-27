@@ -2,11 +2,18 @@
   [modal]="true" [dismissableMask]="true" [appendTo]="'body'" [baseZIndex]="10000"
   [style]="{ width: '90vw', maxWidth: '1200px' }" [contentStyle]="{ height: '80vh', overflow: 'hidden' }"
   (onShow)="onShow()" closeAriaLabel="Schließen">
-  <div *ngIf="!loading && rowsCache.length > 0"
+  <div *ngIf="rowsCache.length > 0"
     style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px; flex-wrap: wrap;">
-    <p-select [options]="periodOptions" optionLabel="label" optionValue="value" [(ngModel)]="period"
-      [ngModelOptions]="{ standalone: true }" (onChange)="onPeriodChange()" placeholder="Period"
-      style="min-width: 140px;" ariaLabel="Zeitraum auswählen"></p-select>
+    <p-toggleButton [(ngModel)]="isTableView" onLabel="Tabelle" offLabel="Chart" onIcon="pi pi-table"
+      offIcon="pi pi-chart-line" styleClass="w-full sm:w-10rem" ariaLabel="Ansicht umschalten"></p-toggleButton>
+
+    <div class="legend-chips-row">
+      <button *ngFor="let opt of periodOptions" class="period-chip" [class.active]="selectedPeriods.includes(opt.value)"
+        (click)="togglePeriod(opt.value)" type="button" [attr.aria-pressed]="selectedPeriods.includes(opt.value)"
+        [attr.aria-label]="opt.label">
+        <span class="chip-label">{{ opt.label }}</span>
+      </button>
+    </div>
 
     <div style="flex-grow: 1; display: flex; align-items: center; gap: 16px; min-width: 300px; padding: 0 10px;">
       <p-inputNumber [(ngModel)]="currentRange.start" [showButtons]="false" (onBlur)="onInputYearChange()"
@@ -38,7 +45,7 @@
     </div>
   </div>
 
-  <div *ngIf="!loading && rowsCache.length === 0 && !error" class="state-container">
+  <div *ngIf="!loading && !hasVisibleData && !error" class="state-container">
     <div class="empty-state-card">
       <span style="font-size: 3.5rem; margin-bottom: 1rem;" role="img" aria-label="Wetterwolke">☁️</span>
       <h3>Keine Daten verfügbar</h3>
@@ -46,14 +53,50 @@
     </div>
   </div>
 
-  <div *ngIf="error" class="state-container error">
+  <div *ngIf="error && !hasVisibleData" class="state-container error">
     <i class="pi pi-exclamation-circle" style="font-size: 3rem;"></i>
     <h3>Fehler</h3>
     <p class="state-text">{{ error }}</p>
   </div>
 
-  <div style="height: calc(100% - 100px); width: 100%" *ngIf="!loading && rowsCache.length > 0 && chartData">
-    <p-chart type="line" [data]="chartData" [options]="chartOptions" [plugins]="[crosshairPlugin]"
-      height="100%"></p-chart>
+  <div style="position: relative; height: calc(100% - 100px); width: 100%;">
+    <!-- Loading Overlay -->
+    <div *ngIf="loading"
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.8); z-index: 10;">
+      <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4"></p-progressSpinner>
+    </div>
+
+    <div style="height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden;"
+      [style.visibility]="hasVisibleData ? 'visible' : 'hidden'">
+      <p-chart *ngIf="!isTableView && hasVisibleData" type="line" [data]="chartData" [options]="chartOptions"
+        [plugins]="[crosshairPlugin]" height="100%" width="100%" style="flex-grow: 1; min-height: 0;"></p-chart>
+
+      <p-table *ngIf="isTableView && hasVisibleData" [value]="tableData" [scrollable]="true" scrollHeight="flex"
+        styleClass="p-datatable-sm p-datatable-striped" [tableStyle]="{ 'min-width': '50rem' }"
+        style="flex-grow: 1; overflow: auto;">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="year">Jahr <p-sortIcon field="year"></p-sortIcon></th>
+            <th pSortableColumn="period">Zeitraum <p-sortIcon field="period"></p-sortIcon></th>
+            <th *ngIf="showTmax" pSortableColumn="tmax">Avg Tmax (°C) <p-sortIcon field="tmax"></p-sortIcon></th>
+            <th *ngIf="showTmin" pSortableColumn="tmin">Avg Tmin (°C) <p-sortIcon field="tmin"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.year }}</td>
+            <td><span class="capitalize">{{ row.period }}</span></td>
+            <td *ngIf="showTmax">
+              <span *ngIf="row.tmax !== null" class="font-bold text-red-500">{{ row.tmax | number:'1.1-1' }}</span>
+              <span *ngIf="row.tmax === null" class="text-gray-400 font-italic">-</span>
+            </td>
+            <td *ngIf="showTmin">
+              <span *ngIf="row.tmin !== null" class="font-bold text-blue-500">{{ row.tmin | number:'1.1-1' }}</span>
+              <span *ngIf="row.tmin === null" class="text-gray-400 font-italic">-</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
 </p-dialog>
