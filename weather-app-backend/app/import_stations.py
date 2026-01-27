@@ -5,6 +5,7 @@ from pathlib import Path
 import requests
 
 STATIONS_URL = "https://noaa-ghcn-pds.s3.amazonaws.com/ghcnd-stations.txt"
+NOA_STATIONS_URL = "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
@@ -13,7 +14,11 @@ STATIONS_TXT = DATA_DIR / "ghcnd-stations.txt"
 
 
 def main():
-    download_file(STATIONS_URL, STATIONS_TXT)
+    try:
+        download_file(STATIONS_URL, STATIONS_TXT)
+    except Exception as e:
+        print(f"Primary URL failed: {e}. Trying fallback...")
+        download_file(NOA_STATIONS_URL, STATIONS_TXT)
 
     conn = sqlite3.connect(DB_PATH)
     create_schema(conn)
@@ -141,7 +146,11 @@ def ensure_stations_imported() -> dict:
         if count > 0:
             return {"imported": False, "stations_count": count}
 
-        download_file(STATIONS_URL, STATIONS_TXT)
+        try:
+            download_file(STATIONS_URL, STATIONS_TXT)
+        except Exception as e:
+            print(f"Primary URL failed: {e}. Trying fallback...")
+            download_file(NOA_STATIONS_URL, STATIONS_TXT)
         import_stations(conn, STATIONS_TXT)
 
         cur = conn.execute("SELECT COUNT(*) FROM stations;")

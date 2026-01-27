@@ -26,3 +26,7 @@ weather.sqlite3
 /data/ghcnd-stations.txt
 .env
 .DS_Store
+# Data files
+*.csv.gz
+*.csv
+/data/s3_csv/
