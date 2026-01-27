@@ -37,6 +37,10 @@ export class App implements OnInit {
           // Backend is ready!
           this.loading.hide();
           this.loading.setMessage(null);
+        } else if (res.error) {
+          // Backend reported an initialization error
+          this.loading.hide();
+          this.loading.setError('Fehler beim Initialisieren: ' + res.error);
         } else {
           // Backend is busy initializing
           // Keep loading screen up, maybe update message if info is available

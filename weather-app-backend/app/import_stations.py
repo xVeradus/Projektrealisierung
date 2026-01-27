@@ -3,6 +3,10 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 import requests
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
 
 STATIONS_URL = "https://noaa-ghcn-pds.s3.amazonaws.com/ghcnd-stations.txt"
 NOA_STATIONS_URL = "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt"
@@ -17,7 +21,7 @@ def main():
     try:
         download_file(STATIONS_URL, STATIONS_TXT)
     except Exception as e:
-        print(f"Primary URL failed: {e}. Trying fallback...")
+        logging.warning(f"Primary URL failed: {e}. Trying fallback...")
         download_file(NOA_STATIONS_URL, STATIONS_TXT)
 
     conn = sqlite3.connect(DB_PATH)
@@ -29,16 +33,23 @@ def main():
 def download_file(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists() and dest.stat().st_size > 0:
-        print(f"File {dest} already exists, skipping download.")
+        logging.info(f"File {dest} already exists, skipping download.")
         return
-    print(f"Downloading {url} to {dest}...")
-    with requests.get(url, stream=True, timeout=30) as r:
-        r.raise_for_status()
-        with open(dest, "wb") as f:
-            for chunk in r.iter_content(chunk_size=1024 * 1024):
-                if chunk:
-                    f.write(chunk)
-    print(f"[OK] Downloaded {dest}.")
+    logging.info(f"Downloading {url} to {dest}...")
+    start_t = time.time()
+    try:
+        with requests.get(url, stream=True, timeout=30) as r:
+            r.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        f.write(chunk)
+        elapsed = time.time() - start_t
+        size_mb = dest.stat().st_size / (1024 * 1024)
+        logging.info(f"[OK] Downloaded {dest} in {elapsed:.2f}s (Size: {size_mb:.2f} MB).")
+    except Exception as e:
+        logging.error(f"Download failed for {url}: {e}")
+        raise e
 
 
 def create_schema(conn: sqlite3.Connection) -> None:
@@ -77,7 +88,7 @@ def parse_station_line(line: str) -> dict:
 
 
 def import_stations(conn: sqlite3.Connection, stations_txt: Path) -> None:
-    print(f"Importing stations from {stations_txt}...")
+    logging.info(f"Importing stations from {stations_txt}...")
 
     insert_sql = """
     INSERT OR REPLACE INTO stations (
@@ -125,14 +136,14 @@ def import_stations(conn: sqlite3.Connection, stations_txt: Path) -> None:
         print(f"  Inserted {count} stations...", end="\r")
 
     conn.commit()
-    print(f"\n[OK] Imported {count} stations.")
+    logging.info(f"[OK] Imported {count} stations.")
 
 
 def ensure_stations_imported() -> dict:
-    print("BASE_DIR:", BASE_DIR)
-    print("DATA_DIR:", DATA_DIR)
-    print("STATIONS_TXT:", STATIONS_TXT)
-    print("DB_PATH:", DB_PATH)
+    logging.info(f"BASE_DIR: {BASE_DIR}")
+    logging.info(f"DATA_DIR: {DATA_DIR}")
+    logging.info(f"STATIONS_TXT: {STATIONS_TXT}")
+    logging.info(f"DB_PATH: {DB_PATH}")
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -149,7 +160,7 @@ def ensure_stations_imported() -> dict:
         try:
             download_file(STATIONS_URL, STATIONS_TXT)
         except Exception as e:
-            print(f"Primary URL failed: {e}. Trying fallback...")
+            logging.warning(f"Primary URL failed: {e}. Trying fallback...")
             download_file(NOA_STATIONS_URL, STATIONS_TXT)
         import_stations(conn, STATIONS_TXT)
 

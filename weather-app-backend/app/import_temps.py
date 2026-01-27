@@ -7,6 +7,8 @@ from typing import Dict, Iterable, Tuple, List, Optional
 import requests
 import pandas as pd
 import numpy as np
+import time
+import logging
 
 S3_BASE_URL = "https://noaa-ghcn-pds.s3.amazonaws.com"
 DLY_BASE_URL = "https://www.ncei.noaa.gov/pub/data/ghcn/daily/all"
@@ -274,15 +276,21 @@ def fetch_and_parse_station_periods(
     
     # TIER 1: Try S3 (CSV)
     try:
+        start_t = time.time()
         df = _load_s3_data(station_id, start_year, end_year, ignore_qflag)
         if not df.empty:
+            elapsed = time.time() - start_t
+            logging.info(f"AWS Loading Time: {elapsed:.2f}s")
             return _process_weather_data(df, start_year, end_year)
-        print("S3 data empty, falling back...")
+        logging.warning("S3 data empty, falling back...")
     except Exception as e:
-        print(f"S3 fetch failed ({e}), falling back to NCEI DLY...")
+        logging.warning(f"S3 fetch failed ({e}), falling back to NCEI DLY...")
 
     # TIER 2: Fallback to NCEI (DLY)
+    start_t = time.time()
     df = _load_dly_data(station_id, start_year, end_year, ignore_qflag)
+    elapsed = time.time() - start_t
+    logging.info(f"NCEI Loading Time: {elapsed:.2f}s")
     return _process_weather_data(df, start_year, end_year)
 
 

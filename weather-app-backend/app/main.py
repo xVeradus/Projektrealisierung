@@ -6,6 +6,8 @@ from typing import List, Optional, Tuple, Dict, Any
 import asyncio
 import sqlite3
 import os
+import time
+import logging
 
 from app.import_stations import ensure_stations_imported
 from app.stations_search import find_stations_nearby
@@ -22,7 +24,10 @@ from app.import_temps import (
 app = FastAPI(title="Weather Data API", version="0.1.0")
 
 # 1. Gzip Compression (optimizes bandwidth)
+# 1. Gzip Compression (optimizes bandwidth)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+logging.basicConfig(level=logging.INFO)
 
 @app.on_event("startup")
 async def startup_event():
@@ -35,7 +40,7 @@ async def startup_event():
             info = await asyncio.to_thread(ensure_stations_imported)
             app.state.stations_info = info
             app.state.stations_ready = True
-            print("[BOOT] stations:", info)
+            print("[BOOT] statrions:", info)
         except Exception as e:
             app.state.stations_error = str(e)
             print("[BOOT] error:", repr(e))
@@ -128,10 +133,13 @@ def station_temps(
     try:
         # Check if we already have data
         create_temps_schema(conn) # Ensure schema exists
+        
+        start_t = time.time()
         rows = get_station_periods(station_id, conn, start_year, end_year)
         
         if rows:
-            print(f"[API] Serving {len(rows)} rows from DB cache")
+            elapsed = time.time() - start_t
+            logging.info(f"[API] Serving {len(rows)} rows from DB cache (Time: {elapsed:.2f}s)")
             return rows
 
         # If no data in DB, fetch live, return immediately, save in background
