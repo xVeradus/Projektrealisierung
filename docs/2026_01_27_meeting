@@ -1,0 +1,103 @@
+# Meetingprotokoll – Softwareprojekt WI23
+
+## 1) Meta
+- **Datum:** 27.01.2026  
+- **Uhrzeit:** 10:00 – 10:45  
+- **Format:** Präsenz  
+- **Projektphase:** Iteration 1 – Anforderungserfassung (MS1)  
+- **Teilnehmer:**  
+  - Auftraggeber: Prof. Dr.-Ing. Wolfgang Funk  
+  - Projektteam:  
+    - Lisa Fritsche (Projektleitung)  
+    - Menko Hornstein  
+    - Finja Sterner  
+    - Jan Goliasch  
+- **Protokoll:** Lisa Fritsche (Projektleitung)
+
+---
+
+## 2) Ziel des Meetings
+Konkretisierung der Use Cases, Abstimmung der Systemarchitektur sowie Präzisierung von Anforderungen an Datenhaltung, GUI und Qualitätsanforderungen.
+
+---
+
+## 3) Zentrale Ergebnisse & Entscheidungen (Decision Log)
+
+| Nr. | Entscheidung | Kontext / Begründung | Verantwortlich |
+|----|-------------|----------------------|----------------|
+| D1 | Es werden zwei zentrale Use Cases definiert. | Fokus auf klare fachliche Abgrenzung der Kernfunktionalitäten. | Projektteam |
+| D2 | Die Architektur folgt einem Client-Server-Modell mit einer API. | Stations- und Messdaten werden serverseitig über eine API bereitgestellt. | Projektteam |
+| D3 | GHCN ist kein Akteur im Use Case. | Die API ist der relevante Akteur; GHCN dient lediglich als Datenquelle. | Projektteam |
+| D4 | Stations- und Messdaten werden beim Start der API geladen und vollständig in einer Datenbank gespeichert. | Vermeidung von Laufzeitabhängigkeiten externer Systeme. | Projektteam |
+| D5 | Die maximale Anzahl der angezeigten Wetterstationen ist begrenzt. | Es werden die Top N Stationen nach Distanz sortiert angezeigt (N = 1–10). | Projektteam |
+| D6 | Der Standard-Suchradius beträgt 50 km. | Verbesserung der Usability durch sinnvolle Voreinstellung. | Projektteam |
+| D7 | Für das Gesamtjahr werden Minimum- und Maximum-Temperaturen farblich hervorgehoben. | Minimum in Blau, Maximum in Rot zur besseren visuellen Unterscheidung. | Projektteam |
+
+---
+
+## 4) Fachliche & technische Konkretisierungen
+
+### 4.1 Use Cases
+- Der Nutzer löst aktiv eine Stationssuche aus (fehlte bislang im Use Case).
+- **Vorbedingung:** Daten sind über die API verfügbar.
+- **Fehlerfall:** Ist die API nicht erreichbar, muss eine entsprechende Meldung angezeigt werden.
+- Ergänzend mögliche fachliche Erweiterung: Niederschlagsmenge (als Variation, nicht zwingend).
+
+---
+
+### 4.2 Architektur & Datenhaltung
+- Die API fungiert als Akteur.
+- Die GHCN-Server werden nicht direkt zur Laufzeit angesprochen.
+- Empfehlung: Nutzung von **zwei URLs** für die Datenquelle.
+- Empfehlung: Einsatz von **Amazon S3 Buckets** zur Erhöhung der Verfügbarkeit.
+- Vorteil: Bei Bedarf kann die Datenquelle durch Austausch der URL gewechselt werden.
+- Hintergrund: GHCN-Server sind zeitweise nicht erreichbar.
+
+---
+
+### 4.3 Qualitätsanforderungen
+- Qualitätsanforderungen werden **ausschließlich aus Kundenvorgaben abgeleitet**.
+- Es sollen **keine eigenen Anforderungen ergänzt** werden.
+- Beispiele:
+  - Lauffähig unter Windows 11
+  - Unterstützung aktueller Versionen von Firefox und Chrome
+
+---
+
+### 4.4 GUI / Visualisierung
+- Radius einstellbar von **1 bis 100 km** in **1-km-Schritten**
+- Anzahl der Ergebnisse einstellbar von **1 bis 10**
+- Einheitliche Sprache im gesamten UI (inkl. Latitude / Longitude)
+- Standort-Pin wird **rot** dargestellt
+- Beim Start der Anwendung ist **keine Vorauswahl** gesetzt
+- Jahresfilter (Start- und Endjahr) fehlt aktuell und muss ergänzt werden
+- Datenlücken werden **nicht** durch gestrichelte Linien dargestellt (keine Darstellung)
+- Bis zu **10 Kurven** gleichzeitig darstellbar
+- Visualisierung erfolgt mit **Chart.js**
+- Slider-Komponenten stammen aus einer UI-Bibliothek
+
+---
+
+## 5) Offene Punkte / ToDos
+
+| Nr. | Aufgabe | Verantwortlich | Deadline | Status |
+|----|---------|----------------|----------|--------|
+| A1 | Use Cases gemäß Meeting-Ergebnissen überarbeiten | Projektteam | offen | open |
+| A2 | Jahresfilter (Start-/Endjahr) in GUI ergänzen | Projektteam | offen | open |
+| A3 | Screenshot des aktuellen GUI-Entwurfs erstellen und ggf. nummerieren | Projektteam | offen | open |
+| A4 | Überarbeitete Use Cases und GUI-Screenshot an Auftraggeber senden | Projektleitung | offen | open |
+
+---
+
+## 6) Change Requests
+Im Rahmen dieses Meetings wurden **keine formalen Change Requests** aufgenommen.
+
+---
+
+## 7) Nächster Termin
+Ein Folgetermin wird bei Bedarf nach Überarbeitung der Use Cases und des GUI-Entwurfs vereinbart.
+
+---
+
+## 8) Hinweise
+Dieses Protokoll gilt als verbindlich, sofern innerhalb von drei Werktagen nach Versand kein Widerspruch erfolgt.
