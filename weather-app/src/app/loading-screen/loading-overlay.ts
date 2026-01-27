@@ -13,7 +13,7 @@ import { ButtonModule } from 'primeng/button';
       <div class="card" [class.error-card]="errorMessage()" [attr.role]="errorMessage() ? 'alert' : null">
         <ng-container *ngIf="!errorMessage()">
           <div class="spinner" aria-hidden="true"></div>
-          <div class="text">Lade Daten…</div>
+          <div class="text">{{ loadingMessage() || 'Lade Daten…' }}</div>
         </ng-container>
 
         <ng-container *ngIf="errorMessage()">
@@ -32,6 +32,7 @@ export class LoadingOverlayComponent {
   private loading = inject(LoadingService);
 
   errorMessage = this.loading.errorMessage;
+  loadingMessage = this.loading.loadingMessage;
 
   showOverlay$ = this.loading.isLoading$.pipe(
     map(count => count > 0 || this.errorMessage() !== null)

@@ -23,9 +23,35 @@ export class App implements OnInit {
 
   private checkConnectivity() {
     this.loading.clearError();
+    // Start blocking loading immediately
+    this.loading.show();
+    this.loading.setMessage("Initialisiere Datenbank... Bitte warten. Dieser Vorgang kann einige Minuten dauern.");
+
+    this.pollBackendReady();
+  }
+
+  private pollBackendReady() {
     this.api.ready().subscribe({
+      next: (res) => {
+        if (res.ready) {
+          // Backend is ready!
+          this.loading.hide();
+          this.loading.setMessage(null);
+        } else {
+          // Backend is busy initializing
+          // Keep loading screen up, maybe update message if info is available
+          if (res.info && res.info.stations_count) {
+            this.loading.setMessage(`Initialisiere Datenbank... (${res.info.stations_count} Stationen geladen)`);
+          }
+          // Retry in 3 seconds
+          setTimeout(() => this.pollBackendReady(), 3000);
+        }
+      },
       error: (err) => {
         console.error('Backend connection check failed:', err);
+        // If 503, it might just be starting up (though usually 503 is handled by catching it in service or here)
+        // If it's a hard error (connection refused), show error.
+        this.loading.hide(); // Hide the "spinner" count so error card shows up if we set error
         this.loading.setError('Das Backend ist nicht erreichbar. Bitte starte den Server.');
       }
     });

@@ -7,6 +7,7 @@ export class LoadingService {
   readonly isLoading$ = this._count.asObservable();
 
   readonly errorMessage = signal<string | null>(null);
+  readonly loadingMessage = signal<string | null>(null);
 
   show(): void {
     this._count.next(this._count.value + 1);
@@ -18,6 +19,10 @@ export class LoadingService {
 
   setError(msg: string | null): void {
     this.errorMessage.set(msg);
+  }
+
+  setMessage(msg: string | null): void {
+    this.loadingMessage.set(msg);
   }
 
   clearError(): void {
