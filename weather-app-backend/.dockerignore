@@ -1,8 +1,7 @@
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.venv/
+__pycache__
+venv
+.git
+.vscode
 .env
-.git/
+weather.sqlite3
 .DS_Store
