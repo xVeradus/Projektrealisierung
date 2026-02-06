@@ -50,7 +50,7 @@ export class PopUpDisplayComponent implements OnChanges {
   error: string | null = null;
   isTableView = false;
 
-  selectedPeriods: Period[] = ['annual']; // Changed from single period
+  selectedPeriods: Period[] = ['annual'];
   periodOptions: { label: string; value: Period }[] = [
     { label: 'Annual', value: 'annual' },
     { label: 'Winter', value: 'winter' },
@@ -59,16 +59,12 @@ export class PopUpDisplayComponent implements OnChanges {
     { label: 'Autumn', value: 'autumn' },
   ];
 
-  /* 
-   * Color mapping for multi-period display
-   * Tmax is stronger, Tmin is lighter or complementary
-   */
   periodColors: Record<Period, { tmax: string; tmin: string }> = {
-    annual: { tmax: '#ef4444', tmin: '#3b82f6' }, // Red / Blue
-    spring: { tmax: '#16a34a', tmin: '#86efac' }, // Green / Light Green
-    summer: { tmax: '#f97316', tmin: '#fbbf24' }, // Orange / Amber
-    autumn: { tmax: '#78350f', tmin: '#d6d3d1' }, // Brown / Light Grey
-    winter: { tmax: '#0ea5e9', tmin: '#a855f7' }, // Cyan / Purple
+    annual: { tmax: '#ef4444', tmin: '#3b82f6' },
+    spring: { tmax: '#16a34a', tmin: '#86efac' },
+    summer: { tmax: '#f97316', tmin: '#fbbf24' },
+    autumn: { tmax: '#78350f', tmin: '#d6d3d1' },
+    winter: { tmax: '#0ea5e9', tmin: '#a855f7' },
   };
 
   rowsCache: TempRow[] = [];
@@ -94,7 +90,6 @@ export class PopUpDisplayComponent implements OnChanges {
       crosshair: {
         color: '#64748b',
         width: 1,
-        // dash: [4, 4]
       }
     }
   };
@@ -112,7 +107,6 @@ export class PopUpDisplayComponent implements OnChanges {
         ctx.lineTo(x, yAxis.bottom);
         ctx.lineWidth = 1;
         ctx.strokeStyle = '#64748b';
-        // ctx.setLineDash([4, 4]);
         ctx.stroke();
         ctx.restore();
       }
@@ -125,7 +119,6 @@ export class PopUpDisplayComponent implements OnChanges {
     const relevant = changes['stationId'];
 
     if (this.visible && relevant) {
-      // If we have an initial range from settings, apply it
       if (this.initialRange) {
         this.currentRange = { start: this.initialRange[0], end: this.initialRange[1] };
         this.selectedRange = [...this.initialRange];
@@ -141,10 +134,8 @@ export class PopUpDisplayComponent implements OnChanges {
   }
 
   onShow(): void {
-    // 1. Ensure chart is resized correctly after Dialog animation (approx 300ms)
     this.forceChartRefresh();
 
-    // 2. Only load if we haven't already
     if (!this.rowsCache.length) {
       this.load();
     }
@@ -160,19 +151,14 @@ export class PopUpDisplayComponent implements OnChanges {
 
   togglePeriod(p: Period): void {
     if (this.selectedPeriods.includes(p)) {
-      // Prevent deselecting the last one to avoid empty state? Or allow it?
-      // Let's allow it but maybe defaults to annual if empty? User might want to clear all.
-      // Actually simpler: just toggle.
       this.selectedPeriods = this.selectedPeriods.filter(x => x !== p);
     } else {
       this.selectedPeriods.push(p);
     }
 
-    // Sort logic to keep legend consistent: annual -> winter -> spring -> summer -> autumn
     const order = ['annual', 'winter', 'spring', 'summer', 'autumn'];
     this.selectedPeriods.sort((a, b) => order.indexOf(a) - order.indexOf(b));
 
-    // Re-calculate range for the new period selection!
     this.recalcRangeForPeriod();
     this.chartData = this.buildChart(this.rowsCache);
   }
@@ -194,11 +180,6 @@ export class PopUpDisplayComponent implements OnChanges {
   private recalcRangeForPeriod(): void {
     if (!this.rowsCache.length) return;
 
-    // If initial range is fixed (from settings), DO NOT auto-adjust minYear/maxYear based on data content
-    // However, the user might want to see the limits of the data. 
-    // The previous logic was: find min/max of VALID data.
-
-    // Union of all selected periods
     const validYears = this.rowsCache
       .filter(r => this.selectedPeriods.includes(r.period) && this.isValidRow(r, r.period))
       .map(r => r.year);
@@ -207,18 +188,10 @@ export class PopUpDisplayComponent implements OnChanges {
       this.minYear = Math.min(...validYears);
       this.maxYear = Math.max(...validYears);
     } else {
-      // Fallback
       this.minYear = 1900;
       this.maxYear = new Date().getFullYear();
     }
 
-    // If we have an initial range, we might want to respect it, but we also need to respect data limits.
-    // For now, let's keep the slider limits based on data, but the selected handles based on user choice.
-
-    // Only reset handles if they are outside valid range OR if this is a fresh load (handled in ngOnChanges/load)
-    // Actually, if user toggles period, let's keep the range as is unless it's null.
-
-    // Safe check
     if (this.currentRange.start < this.minYear) this.currentRange.start = this.minYear;
     if (this.currentRange.end > this.maxYear) this.currentRange.end = this.maxYear;
 
@@ -226,7 +199,6 @@ export class PopUpDisplayComponent implements OnChanges {
   }
 
   load(): void {
-    // 1. Cancel previous request if running
     this.loadSubscription?.unsubscribe();
 
     if (!this.stationId) return;
@@ -241,14 +213,9 @@ export class PopUpDisplayComponent implements OnChanges {
         this.loading = false;
         this.rowsCache = rows ?? [];
 
-        // If initial range was provided, don't override it with auto-calc in recalcRangeForPeriod UNLESS necessary.
-        // Actually recalcRangeForPeriod sets bounds.
-        // Let's modify recalc logic slightly above or just re-apply initial if valid.
-
         this.recalcRangeForPeriod();
 
         if (this.initialRange) {
-          // Ensure initial range is respected even if recalc tried to snap
           this.currentRange.start = Math.max(this.minYear, this.initialRange[0]);
           this.currentRange.end = Math.min(this.maxYear, this.initialRange[1]);
           this.selectedRange = [this.currentRange.start, this.currentRange.end];
@@ -256,7 +223,6 @@ export class PopUpDisplayComponent implements OnChanges {
 
         this.chartData = this.buildChart(this.rowsCache);
 
-        // Force refresh to fix layout glitches
         this.forceChartRefresh();
       },
       error: () => {
@@ -273,9 +239,6 @@ export class PopUpDisplayComponent implements OnChanges {
 
     const data: any[] = [];
 
-    // Flatten data for table: Year | Period | Tmax | Tmin
-    // Filtering by selected periods
-
     const rows = (this.rowsCache ?? []).filter(r =>
       this.selectedPeriods.includes(r.period) &&
       r.year >= yearStart && r.year <= yearEnd
@@ -285,14 +248,13 @@ export class PopUpDisplayComponent implements OnChanges {
       if (this.isValidRow(r, r.period)) {
         data.push({
           year: r.year,
-          period: r.period, // Add period column
+          period: r.period,
           tmax: r.avg_tmax_c,
           tmin: r.avg_tmin_c
         });
       }
     }
 
-    // Sort descending by Year, then by Period index
     const periodOrder = ['annual', 'winter', 'spring', 'summer', 'autumn'];
     return data.sort((a, b) => {
       if (b.year !== a.year) return b.year - a.year;
@@ -308,16 +270,13 @@ export class PopUpDisplayComponent implements OnChanges {
     const datasets: any[] = [];
     const labels: string[] = [];
 
-    // Generate labels once
     for (let y = yearStart; y <= yearEnd; y++) {
       labels.push(String(y));
     }
 
     let globalHasData = false;
 
-    // Loop through each selected period and create datasets
     this.selectedPeriods.forEach(p => {
-      // Create Dictionary for this period
       const rowMap = new Map<number, TempRow>();
       (rows ?? []).forEach((r) => {
         if (r.period === p) rowMap.set(r.year, r);
@@ -341,7 +300,7 @@ export class PopUpDisplayComponent implements OnChanges {
       }
 
       const colors = this.periodColors[p];
-      const labelPrefix = p.charAt(0).toUpperCase() + p.slice(1); // Capitalize
+      const labelPrefix = p.charAt(0).toUpperCase() + p.slice(1);
 
       datasets.push({
         label: `${labelPrefix} Tmax`,
@@ -377,11 +336,7 @@ export class PopUpDisplayComponent implements OnChanges {
   }
 
   private isValidRow(row: TempRow, period: Period): boolean {
-    // Strict quality check to avoid "outliers" from incomplete years.
-    // Annual: require ~10 months (300 days). Seasonal: require ~2.5 months (80 days).
     const minDays = period === 'annual' ? 300 : 80;
-
-    // Check both TMAX and TMIN counts
     return row.n_tmax >= minDays && row.n_tmin >= minDays;
   }
 }

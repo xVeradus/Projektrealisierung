@@ -1,14 +1,6 @@
-# Architecture
+# Architektur
 
-## Communication Canvas
-
-This project follows a structured architectural approach to ensure maintainability, scalability, and clear separation of concerns.
-
-### Value Proposition & Core Functionality
-
-The application aims to make historical weather data accessible and analyzable.
-*   **Core Value**: Easy access to long-term climate data for specific locations.
-### System Architecture
+### Systemarchitektur
 
 ```mermaid
 graph LR
@@ -26,33 +18,37 @@ graph LR
     Backend --> DB
 ```
 
-### Components & Technologies
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant BE as Backend (main.py)
 
-The system is divided into two main containers orchestrated via Docker Compose.
+    Note over BE: 1. Startup (startup_event)
+    FE->>BE: 2. Ready Check (/ready)
+    BE-->>FE: Status: Ready
+    FE->>BE: 3. Stations Search (/stations/search)
+    BE-->>FE: Liste der Stationen
+    FE->>BE: 4. Station Temp (/stations/{id}/temp)
+    BE-->>FE: Temperaturdaten
+```
+
+### Komponenten & Technologien
+
+Das System ist in zwei Hauptcontainer unterteilt, die via Docker Compose orchestriert werden.
 
 #### 1. Backend (Python/FastAPI)
-*   **Technology Stack**: Python 3.12+, FastAPI, SQLite, Pandas.
-*   **Performance Optimizations**: 
-    *   **GZip Compression**: All JSON responses are compressed on-the-fly, reducing station metadata payloads by ~85%.
-    *   **Persistent Caching**: Uses SQLite to store both station metadata and aggregated temperature records.
-*   **Data Strategy**:
-    *   **Lazy Ingestion**: Temperature records are only downloaded and processed when requested for the first time.
-    *   **Pre-aggregation**: Daily NOAA records are aggregated into Annual/Seasonal averages during ingestion for sub-millisecond query performance later.
+*   **Technologie-Stack**: Python 3.12+, FastAPI, SQLite, Pandas.
+*   **Performance-Optimierungen**: 
+    *   **Persistentes Caching**: Nutzt SQLite, um sowohl Stationsmetadaten als auch aggregierte Temperaturdatensätze zu speichern.
+*   **Datenstrategie**:
+    *   **Lazy Ingestion**: Temperaturdatensätze werden erst heruntergeladen und verarbeitet, wenn sie zum ersten Mal angefragt werden.
+    *   **Vor-Aggregation**: Tägliche NOAA-Datensätze werden während der Ingestion zu jährlichen/saisonalen Durchschnittswerten aggregiert, um spätere Abfragen im Sub-Millisekunden-Bereich zu ermöglichen.
 
 #### 2. Frontend (Angular)
-*   **Technology Stack**: Angular 19, PrimeNG, Leaflet, Chart.js.
-*   **State Management**: Uses **Angular Signals** for synchronous, reactive UI state (e.g., current station selection, search radius).
-*   **Visualization Logic**: Custom Chart.js plugins and segment styling to handle data gaps gracefully (dashed bridging).
+*   **Technologie-Stack**: Angular 19, PrimeNG, Leaflet, Chart.js.
+*   **State Management**: Nutzt **Angular Signals** für synchronen, reaktiven UI-Status (z. B. aktuelle Stationsauswahl, Suchradius).
 
-### Infrastructure & Deployment
+### Infrastruktur & Deployment
 
-*   **Docker Orchestration**: The entire stack is containerized.
-*   **Persistent Volumes**: SQLite databases are stored in a Docker volume (`/app/data`) to ensure persistence across container restarts.
-*   **Reverse Proxy**: In production-like builds, Nginx serves the static Angular assets and proxies API requests to the FastAPI backend.
-
-## Design Decisions
-
-*   **SQLite over PostgreSQL**: Chosen for its zero-configuration nature and portability. For a read-heavy historical dataset, file-based storage provides excellent performance with minimal overhead.
-*   **Pandas for ETL**: Leverages highly optimized C-extensions for processing large NOAA CSV files during the "on-demand" ingestion phase.
-*   **Dashed Line Gap Detection**: Decided to use visual bridging (dashed lines) instead of breaking the line graph. This maintains the "trend" visualization while legally communicating where data is missing.
-*   **Signal-based Search**: Decoupling the "Search Pin" position from the "Search Action" to allow for a more interactive and stable user experience.
+*   **Docker-Orchestrierung**: Der gesamte Stack ist containerisiert.
+*   **Persistente Volumes**: SQLite-Datenbanken werden in einem Docker-Volume (`/app/data`) gespeichert, um die Persistenz über Container-Neustarts hinweg zu gewährleisten.

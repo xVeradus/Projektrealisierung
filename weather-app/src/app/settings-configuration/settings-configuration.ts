@@ -46,7 +46,6 @@ export class SettingsConfiguration {
       end_year: this.fb.control<number>(2025),
     });
 
-    // Sync Slider -> Inputs
     this.form.get('year_range')?.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((range: number[]) => {
@@ -58,20 +57,13 @@ export class SettingsConfiguration {
         }
       });
 
-    // Sync Inputs -> Slider
     const syncSliderFromInputs = () => {
       const start = this.form.get('start_year')?.value;
       const end = this.form.get('end_year')?.value;
       if (start !== null && end !== null) {
-        // Ensure valid range
         let newStart = start;
         let newEnd = end;
         if (newStart > newEnd) {
-          // If start is greater, we don't force fix immediately to allow typing, 
-          // but slider might look weird. 
-          // Better to let slider clamp or just update. 
-          // Let's just update, slider handles it or we fix it.
-          // Actually, let's keep it simple.
         }
         this.form.patchValue({ year_range: [newStart, newEnd] }, { emitEvent: false });
       }
@@ -140,7 +132,6 @@ export class SettingsConfiguration {
     const v = this.form.getRawValue() as any;
     this.ui.setCenter(v.lat, v.lon, v.radius_km);
 
-    // Sync year range to UI state for popups
     if (!v.show_all && v.year_range) {
       this.ui.setYearRange([v.year_range[0], v.year_range[1]]);
     } else {
@@ -167,8 +158,6 @@ export class SettingsConfiguration {
       error: (err: unknown) => console.error('Error searching stations:', err),
     });
   }
-
-
 
   reset(): void {
     this.form.reset({

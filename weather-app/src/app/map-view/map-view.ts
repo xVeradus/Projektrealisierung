@@ -9,7 +9,6 @@ import {
   effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 
 import { StationUiStateService } from './map-station';

@@ -1,44 +1,33 @@
-# Setup & Installation
+# Einrichtung & Installation
 
-Follow these steps to get the application running on your local machine.
+Folge diesen Schritten, um die Anwendung lokal auszuführen.
 
-## Prerequisites
+## Voraussetzungen
 
-*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
-*   Git installed.
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) installiert und gestartet.
+*   Git installiert.
 
-## Quick Start
+## Schnellstart
 
-1.  **Clone the Repository**
+1.  **Repository klonen**
     ```bash
     git clone https://github.com/xVeradus/Projektrealisierung.git
     cd Projektrealisierung
     ```
 
-2.  **Start with Docker Compose**
+2.  **Start mit Docker Compose**
     ```bash
     docker-compose up --build
     ```
 
-3.  **Access the Application**
+3.  **Zugriff auf die Anwendung**
     *   Frontend: [http://localhost:8080](http://localhost:8080)
     *   Backend API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-## How to Use
+## Bedienung
 
-1.  **Locate**: Use the map to zoom into your area of interest. 
-2.  **Pin it**: Drag the blue search pin to a specific location. The search radius will update automatically.
-3.  **Search**: Adjust the radius slider in the top panel and coordinates if needed, then click "Search".
-4.  **Explore**: Click on any highlighted weather station marker.
-5.  **Analyze**: View the temperature trends in the popup. Toggle between different periods (Annual/Seasonal) and use the year slider to focuses on specific decades.
-
-## Troubleshooting
-
-### Connection Failed
-If the frontend says "Backend connection check failed", ensure the backend container (`weather_api`) is running healthy. The backend may take a minute on the first run to download/import the global station metadata.
-
-### Port Conflicts
-*   Frontend uses port **8080**.
-*   Backend uses port **8000**.
-Ensure these ports are free on your host machine.
-
+1.  **Navigieren**: Nutze die Karte, um in dein Zielgebiet zu zoomen.
+2.  **Markieren**: Ziehe den blauen Pin an den gewünschten Ort. Der Suchradius passt sich automatisch an.
+3.  **Suchen**: Passe ggf. den Radius-Slider und die Koordinaten an und klicke auf "Suchen".
+4.  **Erkunden**: Klicke auf eine der hervorgehobenen Wetterstationen.
+5.  **Analysieren**: Betrachte die Temperaturverläufe im Popup. Wechsle zwischen Zeiträumen (Jährlich/Saisonal) und nutze den Zeit-Slider für spezifische Jahrzehnte.

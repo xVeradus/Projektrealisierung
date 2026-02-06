@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import sqlite3
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, Tuple, List, Optional
+from typing import Tuple, List, Optional
 import requests
 import pandas as pd
 import numpy as np
@@ -20,26 +19,7 @@ DB_PATH = BASE_DIR / "weather.sqlite3"
 MISSING = -9999
 
 
-@dataclass
-class Agg:
-    sum_tmax: float = 0.0
-    n_tmax: int = 0
-    sum_tmin: float = 0.0
-    n_tmin: int = 0
 
-    def add(self, element: str, v_c: float) -> None:
-        if element == "TMAX":
-            self.sum_tmax += v_c
-            self.n_tmax += 1
-        else:
-            self.sum_tmin += v_c
-            self.n_tmin += 1
-
-    def avg_tmax(self) -> Optional[float]:
-        return (self.sum_tmax / self.n_tmax) if self.n_tmax else None
-
-    def avg_tmin(self) -> Optional[float]:
-        return (self.sum_tmin / self.n_tmin) if self.n_tmin else None
 
 
 def download_from_ncei(station_id: str, dest: Path) -> None:
@@ -61,7 +41,6 @@ def download_from_s3(station_id: str, dest: Path) -> None:
     if dest.exists() and dest.stat().st_size > 0:
         return
 
-    # S3 URL structure verified from user request/curl
     url = f"{S3_BASE_URL}/csv.gz/by_station/{station_id}.csv.gz"
     print(f"Downloading {url} -> {dest}")
     with requests.get(url, stream=True, timeout=30) as r:
@@ -84,8 +63,8 @@ def _load_dly_data(station_id: str, start_year: Optional[int], end_year: Optiona
     
     for i in range(1, 32):
         start = 21 + (i - 1) * 8
-        colspecs.append((start, start + 5))      # Value
-        colspecs.append((start + 6, start + 7))  # QFlag
+        colspecs.append((start, start + 5))      
+        colspecs.append((start + 6, start + 7)) 
         names.append(f"v{i}")
         names.append(f"q{i}")
 
@@ -104,7 +83,6 @@ def _load_dly_data(station_id: str, start_year: Optional[int], end_year: Optiona
     if df.empty:
         return pd.DataFrame()
 
-    # Filter year range early
     if start_year:
         df = df[df["year"] >= start_year]
     if end_year:
@@ -131,24 +109,17 @@ def _load_dly_data(station_id: str, start_year: Optional[int], end_year: Optiona
 def _load_s3_data(station_id: str, start_year: Optional[int], end_year: Optional[int], ignore_qflag: bool) -> pd.DataFrame:
     csv_path = S3_DATA_DIR / f"{station_id}.csv.gz"
     
-    # Try download
     try:
         download_from_s3(station_id, csv_path)
     except Exception as e:
         print(f"S3 Download failed: {e}")
-        # Clean up partial download logic handled by download helper?
-        # If open(dest, "wb") failed mid-way, file might exist but be corrupt. 
-        # Ideally download to .tmp and rename. For now, we assume requests raises before writing much if 404.
         if csv_path.exists() and csv_path.stat().st_size == 0:
              csv_path.unlink()
-        raise e # Re-raise to trigger fallback
+        raise e 
 
-    # Columns: station_id, date(YYYYMMDD), element, value, mflag, qflag, sflag, obstime
-    # We only need: ID, DATE, ELEMENT, VALUE, QFLAG
     names = ["station_id", "date", "element", "value", "mflag", "qflag", "sflag", "obstime"]
     
     try:
-        # verify compression='gzip' works automatically if ext is .gz usually, but explicit is good
         df = pd.read_csv(csv_path, names=names, header=None, usecols=["station_id", "date", "element", "value", "qflag"], dtype={"station_id": str, "date": str, "element": str, "value": float})
     except Exception as e:
         print(f"Error reading S3 CSV {csv_path}: {e}")
@@ -157,8 +128,6 @@ def _load_s3_data(station_id: str, start_year: Optional[int], end_year: Optional
     if df.empty:
         return pd.DataFrame()
 
-    # Parse Date
-    # YYYYMMDD -> Year, Month
     df["year"] = df["date"].str.slice(0, 4).astype(int)
     df["month"] = df["date"].str.slice(4, 6).astype(int)
 
@@ -169,26 +138,18 @@ def _load_s3_data(station_id: str, start_year: Optional[int], end_year: Optional
 
     df = df[df["element"].isin(["TMAX", "TMIN"])]
     
-    # Value is in tenths of degrees C, same as DLY.
-    # No missing value filtering needed typically for CSV as rows are omitted, but let's be safe
-    # MISSING is -9999 in DLY. In CSV ? Likely not present. 
-    
     if ignore_qflag:
         mask_valid = df["qflag"].isna() | (df["qflag"].astype(str).str.strip() == "")
         df = df[mask_valid]
 
-    # Normalize columns to match DLY output
-    # DLY output: station_id, year, month, element, value, qflag
     return df[["station_id", "year", "month", "element", "value"]]
 
 def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_year: Optional[int]) -> List[Tuple]:
     if df_v.empty:
         return []
 
-    # Convert to Celsius
     df_v["value"] = df_v["value"] / 10.0
 
-    # Determine Season
     df_v["season"] = df_v["month"].map({
         3: "spring", 4: "spring", 5: "spring",
         6: "summer", 7: "summer", 8: "summer",
@@ -199,23 +160,18 @@ def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_yea
     df_v["season_year"] = df_v["year"]
     df_v.loc[df_v["month"] == 12, "season_year"] += 1
 
-    # Aggregation
-    
-    # 1. Annual Stats
     grp_annual = df_v.groupby(["station_id", "year", "element"])["value"].agg(["mean", "count"])
     grp_annual = grp_annual.unstack("element") 
     grp_annual.columns = [f"{x}_{y}" for x, y in grp_annual.columns]
     grp_annual = grp_annual.reset_index()
     grp_annual["period"] = "annual"
     
-    # 2. Seasonal Stats
     grp_seasonal = df_v.groupby(["station_id", "season_year", "season", "element"])["value"].agg(["mean", "count"])
     grp_seasonal = grp_seasonal.unstack("element")
     grp_seasonal.columns = [f"{x}_{y}" for x, y in grp_seasonal.columns]
     grp_seasonal = grp_seasonal.reset_index()
     grp_seasonal = grp_seasonal.rename(columns={"season_year": "year", "season": "period"})
     
-    # Combine
     final_df = pd.concat([grp_annual, grp_seasonal], ignore_index=True)
     
     expected_cols = ["mean_TMAX", "mean_TMIN", "count_TMAX", "count_TMIN"]
@@ -274,7 +230,6 @@ def fetch_and_parse_station_periods(
     end_year: Optional[int] = None,
 ) -> List[Tuple]:
     
-    # TIER 1: Try S3 (CSV)
     try:
         start_t = time.time()
         df = _load_s3_data(station_id, start_year, end_year, ignore_qflag)
@@ -286,7 +241,6 @@ def fetch_and_parse_station_periods(
     except Exception as e:
         print(f"S3 fetch failed ({e}), falling back to NCEI DLY...", flush=True)
 
-    # TIER 2: Fallback to NCEI (DLY)
     start_t = time.time()
     df = _load_dly_data(station_id, start_year, end_year, ignore_qflag)
     elapsed = time.time() - start_t
@@ -295,10 +249,6 @@ def fetch_and_parse_station_periods(
 
 
 def save_station_periods_to_db(conn: sqlite3.Connection, rows: List[Tuple]) -> None:
-    """
-    Persists the parsed rows into the database.
-    This can be called in a background task.
-    """
     conn.executemany(
         """
         INSERT OR REPLACE INTO station_temp_period
@@ -317,9 +267,6 @@ def import_station_periods(
     start_year: Optional[int] = None,
     end_year: Optional[int] = None,
 ) -> None:
-    """
-    Synchronous wrapper for backward compatibility or bulk imports.
-    """
     rows = fetch_and_parse_station_periods(
         station_id, ignore_qflag, start_year, end_year
     )
@@ -424,35 +371,7 @@ def get_station_periods(
     return [dict(r) for r in rows]
 
 
-def season_year(year: int, month: int) -> int:
-    if month == 12:
-        return year + 1
-    return year
 
-
-def iter_dly_values(lines: Iterable[str]) -> Iterable[Tuple[int, int, str, int, str]]:
-    for line in lines:
-        if not line.strip():
-            continue
-
-        year = int(line[11:15])
-        month = int(line[15:17])
-        element = line[17:21]
-
-        if element not in ("TMAX", "TMIN"):
-            continue
-
-        for day in range(31):
-            base = 21 + day * 8
-            value_str = line[base: base + 5]
-            qflag = line[base + 6: base + 7]
-
-            try:
-                value = int(value_str)
-            except ValueError:
-                continue
-
-            yield year, month, element, value, qflag
 
 
 def create_schema(conn: sqlite3.Connection) -> None:

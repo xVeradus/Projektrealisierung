@@ -23,7 +23,6 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-  custom_dir: overrides
   features:
     - navigation.tabs
     - navigation.sections
@@ -37,6 +36,7 @@ theme:
     - content.code.annotate
     - toc.follow
     - toc.integrate
+
   
 extra:
   social:
@@ -74,10 +74,22 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Welcome: index.md
-  - Architecture: architecture.md
-  - Details:
-    - Backend: backend.md
-    - Frontend: frontend.md
-  - Installation: setup.md
   - 🏠 Zurück zur App: http://localhost:8080
+  - Home: index.md
+  - Architektur: architecture.md
+  - Backend:
+      - Übersicht: backend/index.md
+      - main.py: backend/main.md
+      - import_stations.py: backend/import_stations.md
+      - stations_search.py: backend/stations_search.md
+      - import_temps.py: backend/import_temps.md
+  - Frontend:
+      - Overview: frontend/index.md
+      - Data View Page: frontend/data-view-page.md
+      - Map View: frontend/map-view.md
+      - Settings: frontend/settings-configuration.md
+      - Pop-Up Display: frontend/pop-up-display.md
+      - Loading Screen: frontend/loading-screen.md
+      - API Service: frontend/weather-api.md
+  - Installation: setup.md
+  

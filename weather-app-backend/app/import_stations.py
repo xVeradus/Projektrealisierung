@@ -6,9 +6,11 @@ import requests
 import logging
 import time
 
+# AWS and NOAA URLs for daily data
 STATIONS_URL = "https://noaa-ghcn-pds.s3.amazonaws.com/ghcnd-stations.txt"
 NOA_STATIONS_URL = "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt"
 
+# Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = BASE_DIR / "weather.sqlite3"

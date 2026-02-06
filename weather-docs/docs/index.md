@@ -1,23 +1,23 @@
-# Weather App Documentation
+# Wetter-App Dokumentation
 
-Welcome to the documentation for the **Weather App**, a historical weather station data viewer and analysis tool.
+Willkommen in der Dokumentation der **Weather App**, einem revolutionären Tool zur Anzeige und Analyse historischer Wetterstationsdaten.
 
-## Project Overview
+## Projektübersicht
 
-The **Weather App** is a specialized tool designed to explore and analyze decades of historical climate data. It connects to the NOAA Global Historical Climatology Network (GHCN) to provide users with a seamless, interactive experience for visualizing temperature trends across the globe.
+Die **Weather App** ist ein spezialisiertes Tool zur Erkundung und Analyse jahrzehntelanger historischer Klimadaten. Sie verbindet sich mit dem NOAA Global Historical Climatology Network (GHCN), um Nutzern eine nahtlose, interaktive Erfahrung zur Visualisierung von Temperaturtrends auf der ganzen Welt zu bieten.
 
-### ✨ Core Features
+### ✨ Kernfunktionen
 
-*   **📍 Spatial Discovery**:
-    Explore historical weather stations in the surrounding of your current or any location using the interactive map.
-*   **📈 Visual Analysis**: High-performance charts (Chart.js) that handle missing data gracefully using dashed lines to maintain visual continuity without misrepresenting gaps.
-*   **:material-speedometer: Optimized Backend**: A FastAPI-powered engine utilizing SQLite for efficient local caching, Pandas for rapid data processing, and GZip compression for minimal network latency.
-*   **:material-layers-outline: Modular Architecture**: Built with Angular 19 and modern UI components, emphasizing a clean "glassmorphism" aesthetic and responsive layout.
-*   **:material-database-sync: Smart Data Ingestion**: Lazy-loading strategy that fetches and aggregates daily climate records on-demand, ensuring the system remains lightweight yet comprehensive.
+*   **📍 Immersive Räumliche Entdeckung**:
+    Tauche ein in die Welt der historischen Klimadaten. Erkunde nahtlos Wetterstationen in deiner unmittelbaren Umgebung oder an jedem beliebigen Ort des Globus durch unsere hochresponsive, interaktive Karten-Schnittstelle.
+*   **📈 Präzisions-Visualisierung**: Erlebe Datenvisualisierung auf neuem Niveau. Unsere High-Performance-Charts rendern Jahrzehnte an Daten in Millisekunden und schließen Datenlücken intelligent und ästhetisch anspruchsvoll, um ein unverfälschtes Bild der klimatischen Historie zu zeichnen.
+*   **⚡ High-Velocity Backend Engine**: Angetrieben von einer hochoptimierten FastAPI-Architektur. Wir nutzen SQLite für blitzschnelles lokales Caching und Pandas für Datenverarbeitung in Echtzeit – maximale Effizienz für minimale Latenz.
+*   **💎 Ästhetische Modulare Architektur**: Ein Meisterwerk moderner Webentwicklung, realisiert mit Angular 19. Das Design folgt strengen "Glassmorphism"-Prinzipien und bietet eine luxuriöse, responsive Benutzeroberfläche, die auf jedem Gerät glänzt.
+*   **🔄 Intelligente On-Demand Ingestion**: Eine fortschrittliche Lazy-Loading-Strategie, die globale Klimadatensätze nur bei Bedarf abruft und dynamisch aggregiert. Das System bleibt federleicht, während es Zugriff auf ein massives Datenuniversum bietet.
 
 ## Navigation
 
-*   **[Architecture](architecture.md)**: High-level overview of the system components and design decisions.
-*   **[Backend](backend.md)**: Details on the API, database schema, and data import processes.
-*   **[Frontend](frontend.md)**: Information about the Angular application, components, and state management.
-*   **[Setup & Installation](setup.md)**: Guide to getting the application running locally using Docker.
+*   **[Architektur](architecture.md)**: High-Level-Überblick über die Systemkomponenten und Designentscheidungen.
+*   **[Backend](backend/index.md)**: Details zur API, dem Datenbankschema und den Datenimportprozessen.
+*   **[Frontend](frontend/index.md)**: Informationen über die Angular-Anwendung, Komponenten und das State Management.
+*   **[Einrichtung & Installation](setup.md)**: Anleitung zur lokalen Ausführung der Anwendung mit Docker.

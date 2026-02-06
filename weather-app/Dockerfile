@@ -26,12 +26,7 @@ RUN echo 'server { \
     add_header X-Content-Type-Options "nosniff" always; \
     add_header Referrer-Policy "strict-origin-when-cross-origin" always; \
     add_header Content-Security-Policy "default-src '\''self'\''; script-src '\''self'\'' '\''unsafe-inline'\'' '\''unsafe-eval'\''; style-src '\''self'\'' '\''unsafe-inline'\''; connect-src '\''self'\'' http://localhost:8000 http://127.0.0.1:8000; img-src '\''self'\'' data: https://*.basemaps.cartocdn.com https://*.openstreetmap.org https://tile.openstreetmap.org; font-src '\''self'\'' data:;" always; \
-    \
-    gzip on; \
-    gzip_vary on; \
-    gzip_proxied any; \
-    gzip_comp_level 6; \
-    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml application/javascript application/json image/svg+xml; \
+
     \
     location / { \
     try_files $uri $uri/ /index.html; \

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
+
 from pydantic import BaseModel
 from typing import List, Optional, Tuple, Dict, Any
 import asyncio
@@ -9,9 +9,13 @@ import os
 import time
 import logging
 
+
+# Funktionen für die Stationen
 from app.import_stations import ensure_stations_imported
 from app.stations_search import find_stations_nearby
 
+
+# Funktionen für die Temperaturen
 from app.import_temps import (
     DB_PATH,
     create_schema as create_temps_schema,
@@ -21,15 +25,12 @@ from app.import_temps import (
     save_station_periods_to_db,
 )
 
+# Initalisierung der App durch FastAPI
 app = FastAPI(title="Weather Data API", version="0.1.0")
 
-# 1. Gzip Compression (optimizes bandwidth)
-# 1. Gzip Compression (optimizes bandwidth)
-app.add_middleware(GZipMiddleware, minimum_size=1000)
-
+# 1. Startup Event Makes sure, that the database is initialized and ready to serve requests
 @app.on_event("startup")
 async def startup_event():
-    print("--- BACKEND VERSION 2.0 (DEBUG) ---", flush=True)
     app.state.stations_ready = False
     app.state.stations_error = None
     app.state.stations_info = None
@@ -46,7 +47,9 @@ async def startup_event():
 
     asyncio.create_task(_bootstrap())
 
+# 2. Ready Endpoint Checks if the database is initialized and ready to serve requests
 @app.get("/api/ready")
+# API ready check
 def ready():
     print("[API] Ready check requested")
     return {
@@ -55,14 +58,17 @@ def ready():
         "info": getattr(app.state, "stations_info", None),
     }
 
+# Guard function to check if the database is initialized and ready to serve requests
 def _require_ready():
     if getattr(app.state, "stations_error", None):
         raise HTTPException(status_code=500, detail=app.state.stations_error)
     if not getattr(app.state, "stations_ready", False):
         raise HTTPException(status_code=503, detail="Stations DB initializing")
 
+# Allowed origins 
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:4200,http://127.0.0.1:4200,http://localhost:8080,http://127.0.0.1:8080").split(",")
 
+# CORS middleware to allow cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -71,6 +77,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Data models for API requests and responses
 class StationSearchRequest(BaseModel):
     lat: float
     lon: float
@@ -86,6 +93,7 @@ class StationItem(BaseModel):
     lon: float
     distance_km: float
 
+# Stationssuche um Umgebungssuche
 @app.post("/api/stations/search", response_model=List[StationItem])
 def search_stations(request: StationSearchRequest):
     _require_ready()
@@ -100,8 +108,8 @@ def search_stations(request: StationSearchRequest):
     )
     return stations
 
+# Helper function for background tasks to save data to the database
 def _background_save_to_db(rows: List[Tuple]):
-    """Helper to open a fresh connection for the background task"""
     print(f"[BG] Saving {len(rows)} rows to DB...")
     conn = sqlite3.connect(DB_PATH)
     try:
@@ -111,6 +119,7 @@ def _background_save_to_db(rows: List[Tuple]):
     finally:
         conn.close()
 
+# Endpoint to get temperature data for a specific station
 @app.get("/api/stations/{station_id}/temps")
 def station_temps(
     station_id: str,
@@ -119,14 +128,15 @@ def station_temps(
     start_year: Optional[int] = None,
     end_year: Optional[int] = None,
 ):
-    # 2. Browser Caching (1 day)
-    # This tells the browser: "Keep this valid for 24 hours"
+    # Browser Caching (1 day)
     response.headers["Cache-Control"] = "public, max-age=86400"
 
+    # Check if the year range is valid
     if start_year is not None and end_year is not None and start_year > end_year:
         raise HTTPException(
             status_code=400, detail="start_year must be <= end_year")
 
+    # Connect to the database
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     try:
