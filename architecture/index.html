@@ -1770,8 +1770,8 @@
         Frontend[Angular Frontend]
         Backend[FastAPI Backend]
         DB[(SQLite DB)]
-        Docs[MkDocs Material]
     end
+    Docs[MkDocs (GitHub Pages)]
 
     User --&gt; Frontend
     User --&gt; Docs
@@ -1822,8 +1822,7 @@
 <h4 id="docker-betrieb-lokale-ausfuhrung">Docker-Betrieb &amp; Lokale Ausführung<a class="headerlink" href="#docker-betrieb-lokale-ausfuhrung" title="Permanent link">&para;</a></h4>
 <p>Die Anwendung besteht aus einem Multi-Container Setup, welches durch <code>docker-compose.yml</code> orchestriert wird:
 1.  <strong>Backend (<code>weather_api</code>)</strong>: Ein Python-basierter Container (<code>python:3.11-slim</code>), der die FastAPI-Anwendung über den schnellen Uvicorn-Server asynchron auf Port <code>8000</code> ausführt.
-2.  <strong>Frontend (<code>weather_app</code>)</strong>: Ein mehrstufiger Build (<code>node</code> zum Kompilieren der Angular-Dateien, <code>nginx:alpine</code> zum Ausliefern). Nginx dient dabei als leichtgewichtiger, ultraschneller Webserver auf Port <code>8080</code>, der die statischen Dateien zudem via "GZIP" vorkomprimiert ausliefert (Performance Score).
-3.  <strong>Dokumentation (<code>weather_docs</code>)</strong>: Ein MkDocs-Container zur Entwicklungszeit, um das Nachschlagewerk lokal zu hosten.</p>
+2.  <strong>Frontend (<code>weather_app</code>)</strong>: Ein mehrstufiger Build (<code>node</code> zum Kompilieren der Angular-Dateien, <code>nginx:alpine</code> zum Ausliefern). Nginx dient dabei als leichtgewichtiger, ultraschneller Webserver auf Port <code>8080</code>, der die statischen Dateien zudem via "GZIP" vorkomprimiert ausliefert (Performance Score).</p>
 <p><strong>Kommunikation der Container</strong>: 
 Frontend und Backend befinden sich im selben isolierten Docker-Netzwerk. Das Angular-Frontend kommuniziert jedoch klassisch über das Host-System auf das Backend (CORS und Ports werden entsprechend verwaltet), oder – falls ein Reverse Proxy wie Nginx davor geschaltet wäre – direkt über Host-Header-Routings.</p>
 <p>Mit dem simplen Befehl <code>docker-compose up --build</code> wird der komplette Verbund vollautomatisch hochgefahren und benötigt keinerlei weitere lokale Installationen (wie Python-Envs, Node-Modules oder Datenbank-Server). Dies repräsentiert das <strong>"Zero-Configuration"</strong>-Prinzip.</p>
@@ -1907,15 +1906,15 @@ Frontend und Backend befinden sich im selben isolierten Docker-Netzwerk. Das Ang
 <h5 id="kontext_5">Kontext<a class="headerlink" href="#kontext_5" title="Permanent link">&para;</a></h5>
 <p>Technische Dokumentation veraltet oft, wenn sie extern (z.B. Wiki, PDF) gepflegt wird. Sie soll Teil des Entwicklungsprozesses sein ("Docs-as-Code").</p>
 <h5 id="entscheidung_5">Entscheidung<a class="headerlink" href="#entscheidung_5" title="Permanent link">&para;</a></h5>
-<p>Wir liefern die Dokumentation (MkDocs) als eigenen <strong>Docker-Service</strong> im selben Stack aus.</p>
+<p>Wir pflegen die Dokumentation (MkDocs) im selben Repository und spielen sie automatisiert über <strong>GitHub Actions auf GitHub Pages</strong> aus.</p>
 <h5 id="status_5">Status<a class="headerlink" href="#status_5" title="Permanent link">&para;</a></h5>
 <p>Accepted</p>
 <h5 id="konsequenzen_5">Konsequenzen<a class="headerlink" href="#konsequenzen_5" title="Permanent link">&para;</a></h5>
 <ul>
 <li>(+) Dokumentation und Code sind im selben Repository versioniert.</li>
-<li>(+) Lokale Verfügbarkeit auch ohne Internet (Offline-Modus).</li>
-<li>(+) Einheitliches Deployment via <code>docker-compose up</code>.</li>
-<li>(-) Ein zusätzlicher Container verbraucht (geringe) Ressourcen.</li>
+<li>(+) Weltweite Verfügbarkeit ohne Performance-Hit auf dem eigenen Server.</li>
+<li>(+) "Zero-Maintenance" Hosting dank GitHub Pages.</li>
+<li>(-) Erfordert CI/CD Pipeline Konfiguration (.github/workflows).</li>
 </ul>
 
 
