@@ -1780,13 +1780,19 @@
 <pre class="mermaid"><code>sequenceDiagram
     participant FE as Frontend
     participant BE as Backend (main.py)
+    participant DB as SQLite DB
 
     Note over BE: 1. Startup (startup_event)
+    BE-&gt;&gt;DB: Check/Init Tables
     FE-&gt;&gt;BE: 2. Ready Check (/ready)
     BE--&gt;&gt;FE: Status: Ready
     FE-&gt;&gt;BE: 3. Stations Search (/stations/search)
+    BE-&gt;&gt;DB: Query Stations in Radius
+    DB--&gt;&gt;BE: Station Results
     BE--&gt;&gt;FE: Liste der Stationen
     FE-&gt;&gt;BE: 4. Station Temp (/stations/{id}/temp)
+    BE-&gt;&gt;DB: Query Aggregated Temp Data
+    DB--&gt;&gt;BE: Temp Results
     BE--&gt;&gt;FE: Temperaturdaten</code></pre>
 <h3 id="komponenten-technologien">Komponenten &amp; Technologien<a class="headerlink" href="#komponenten-technologien" title="Permanent link">&para;</a></h3>
 <p>Das System ist in zwei Hauptcontainer unterteilt, die via Docker Compose orchestriert werden.</p>
