@@ -1,0 +1,2919 @@
+
+<!doctype html>
+<html lang="de" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Historical weather data exploration and analysis tool.">
+      
+      
+        <meta name="author" content="xVeradus">
+      
+      
+      
+        <link rel="prev" href="../testing_documentation/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+    
+    
+      
+        <title>Systemtests - Weather App Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#systemtests-fur-die-anwendung-zur-suche-historischer-wetterstationsdaten" class="md-skip">
+          Zum Inhalt
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
+    <a href=".." title="Weather App Documentation" class="md-header__button md-logo" aria-label="Weather App Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Weather App Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Systemtests
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Suche" placeholder="Suche" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Suche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Teilen" aria-label="Teilen" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Zurücksetzen" aria-label="Zurücksetzen" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Suche wird initialisiert
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Hauptnavigation" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/xVeradus/Projektrealisierung" class="md-tabs__link">
+        
+  
+  
+    
+  
+  🏠 Zum GitHub Repository
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architektur
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../backend/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Backend
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../frontend/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Frontend
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../setup/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Installation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../testing_doku/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Testing
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Weather App Documentation" class="md-nav__button md-logo" aria-label="Weather App Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Weather App Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/xVeradus/Projektrealisierung" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Zum GitHub Repository
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architektur
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../backend/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/main/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    main.py
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/import_stations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    import_stations.py
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/stations_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    stations_search.py
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/import_temps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    import_temps.py
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../frontend/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Frontend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/data-view-page/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data View Page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/map-view/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Map View
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/settings-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/pop-up-display/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pop-Up Display
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/loading-screen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loading Screen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/weather-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing_doku/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Übersicht Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing_documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Detailed Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systemtests
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systemtests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Inhaltsverzeichnis">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Inhaltsverzeichnis
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-dokumentinformationen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Dokumentinformationen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ziel-des-dokuments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ziel des Dokuments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-testumfang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Testumfang
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Testumfang">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-abgedeckte-mindestanforderungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Abgedeckte Mindestanforderungen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-nicht-bestandteil" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Nicht Bestandteil
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-testumgebung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Testumgebung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-testdatenbasis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Testdatenbasis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Testdatenbasis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-referenzdaten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Referenzdaten
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-systemtests-standortsuche-mit-parameterkombinationen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Systemtests – Standortsuche mit Parameterkombinationen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Systemtests – Standortsuche mit Parameterkombinationen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-standort-1-berlin-mitte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Standort 1: Berlin (Mitte)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1 Standort 1: Berlin (Mitte)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testmatrix-standort-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testmatrix Standort 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifizierte-werte-standort-1-fur-st-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifizierte Werte Standort 1 (für ST-1.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-standort-2-zugspitze-deutschland" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Standort 2: Zugspitze (Deutschland)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2 Standort 2: Zugspitze (Deutschland)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testmatrix-standort-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testmatrix Standort 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifizierte-werte-standort-2-fur-st-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifizierte Werte Standort 2 (für ST-2.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-standort-3-new-york-city-central-park" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Standort 3: New York City (Central Park)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.3 Standort 3: New York City (Central Park)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testmatrix-standort-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testmatrix Standort 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifizierte-werte-standort-3-fur-st-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifizierte Werte Standort 3 (für ST-3.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-standort-4-munchen-zentrum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Standort 4: München (Zentrum)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.4 Standort 4: München (Zentrum)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testmatrix-standort-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testmatrix Standort 4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifizierte-werte-standort-4-fur-st-41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifizierte Werte Standort 4 (für ST-4.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-abgedeckte-falle-durch-abschnitt-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Abgedeckte Fälle durch Abschnitt 6
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-stationsbezogene-verifikation-gesamtjahr-und-jahreszeiten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Stationsbezogene Verifikation – Gesamtjahr und Jahreszeiten
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Stationsbezogene Verifikation – Gesamtjahr und Jahreszeiten">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-station-zu-standort-1-berlin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Station zu Standort 1 (Berlin)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.1 Station zu Standort 1 (Berlin)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifikation-der-werte-jahr-2019" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifikation der Werte (Jahr 2019)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-station-zu-standort-2-zugspitze" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Station zu Standort 2 (Zugspitze)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.2 Station zu Standort 2 (Zugspitze)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifikation-der-werte-jahr-2019_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifikation der Werte (Jahr 2019)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-station-zu-standort-3-new-york" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Station zu Standort 3 (New York)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.3 Station zu Standort 3 (New York)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifikation-der-werte-jahr-2019_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifikation der Werte (Jahr 2019)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-station-zu-standort-4-munchen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Station zu Standort 4 (München)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.4 Station zu Standort 4 (München)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifikation-der-werte-jahr-2019_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifikation der Werte (Jahr 2019)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-abgedeckte-falle-durch-abschnitt-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 Abgedeckte Fälle durch Abschnitt 7
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-protokollierung-der-durchfuhrung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Protokollierung der Durchführung
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Protokollierung der Durchführung">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-durchfuhrungsprotokoll-tester-1-ben-sieburg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 Durchführungsprotokoll – Tester 1 (Ben Sieburg)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-durchfuhrungsprotokoll-tester-2-felix-droste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Durchführungsprotokoll – Tester 2 (Felix Droste)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-vergleich-der-ergebnisse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 Vergleich der Ergebnisse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-abweichungen-fehler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Abweichungen / Fehler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#85-testzusammenfassung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.5 Testzusammenfassung
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-bewertung-der-anforderungserfullung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Bewertung der Anforderungserfüllung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-freigabe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Freigabe
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="systemtests-fur-die-anwendung-zur-suche-historischer-wetterstationsdaten">Systemtests für die Anwendung zur Suche historischer Wetterstationsdaten<a class="headerlink" href="#systemtests-fur-die-anwendung-zur-suche-historischer-wetterstationsdaten" title="Permanent link">&para;</a></h1>
+<h2 id="1-dokumentinformationen">1. Dokumentinformationen<a class="headerlink" href="#1-dokumentinformationen" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feld</th>
+<th style="text-align: left;">Wert</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Projekt / Anwendung:</strong></td>
+<td style="text-align: left;">Weather App - Historical Data Viewer</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Version / Build:</strong></td>
+<td style="text-align: left;">v1.0.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Datum:</strong></td>
+<td style="text-align: left;">01.03.2026</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autoren / Tester:</strong></td>
+<td style="text-align: left;">Ben Sieburg, Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Prüfer / Freigabe:</strong></td>
+<td style="text-align: left;">Menko Hornstein</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-ziel-des-dokuments">2. Ziel des Dokuments<a class="headerlink" href="#2-ziel-des-dokuments" title="Permanent link">&para;</a></h2>
+<p>Dieses Dokument beschreibt die Durchführung und Dokumentation der Systemtests für die Anwendung, mit der historische Daten von Wetterstationen anhand von Koordinaten gesucht werden können.</p>
+<p>Die Systemtests wurden von zwei Personen unabhängig voneinander durchgeführt. Die Ergebnisse beider Durchführungen werden getrennt dokumentiert und anschließend verglichen.</p>
+<p><strong>Ziel:</strong> Nachweis, dass die Suche nach Wetterstationsdaten anhand der vorgegebenen Parameter korrekt funktioniert.</p>
+<p>Geprüft werden insbesondere:
+- Standortsuche über Koordinaten
+- Filterung über Suchradius
+- Filterung über Anfangs- und Endjahr
+- Zuordnung und Anzeige passender Wetterstationen
+- Korrekte Werte für Gesamtjahr und Jahreszeiten
+- Vollständige Protokollierung der Testdurchführung</p>
+<hr />
+<h2 id="3-testumfang">3. Testumfang<a class="headerlink" href="#3-testumfang" title="Permanent link">&para;</a></h2>
+<h3 id="31-abgedeckte-mindestanforderungen">3.1 Abgedeckte Mindestanforderungen<a class="headerlink" href="#31-abgedeckte-mindestanforderungen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Anforderung</th>
+<th style="text-align: left;">Beschreibung</th>
+<th style="text-align: left;">Abdeckung im Dokument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>A1</strong></td>
+<td style="text-align: left;">Drei Standorte mit überprüften Werten für verschiedene Kombinationen von Suchradius, Anfangs- und Endjahr</td>
+<td style="text-align: left;">Abschnitt 6</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>A2</strong></td>
+<td style="text-align: left;">Pro Standort eine Station mit überprüften Werten für Gesamtjahr und Jahreszeiten</td>
+<td style="text-align: left;">Abschnitt 7</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>A3</strong></td>
+<td style="text-align: left;">Dokumentation, welche Fälle durch die Tests abgedeckt werden</td>
+<td style="text-align: left;">Abschnitte 6.5 und 7.5</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>A4</strong></td>
+<td style="text-align: left;">Protokollierung der Durchführung</td>
+<td style="text-align: left;">Abschnitt 8</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-nicht-bestandteil">3.2 Nicht Bestandteil<a class="headerlink" href="#32-nicht-bestandteil" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bereich</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Backend-Unit-Tests</td>
+<td style="text-align: left;">Werden in der separaten <a href="../testing_documentation/">Testing Documentation</a> abgedeckt.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-testumgebung">4. Testumgebung<a class="headerlink" href="#4-testumgebung" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Wert</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>System / URL</strong></td>
+<td style="text-align: left;"><code>http://localhost:8080/</code> (Lokale Docker-Instanz)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Version / Commit / Build</strong></td>
+<td style="text-align: left;"><code>main</code> Branch (Build Feb/März 2026)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Testdatum</strong></td>
+<td style="text-align: left;">01.03.2026</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Betriebssystem</strong></td>
+<td style="text-align: left;">macOS / Windows 11</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Browser / Laufzeitumgebung</strong></td>
+<td style="text-align: left;">Google Chrome Version 120+</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Datenquelle / Datenbankstand</strong></td>
+<td style="text-align: left;">NOAA GHCND Daily Summaries (S3 / NCEI Fallback)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sonstige Voraussetzungen</strong></td>
+<td style="text-align: left;">Aktive Internetverbindung für Map-Tiles (Leaflet)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-testdatenbasis">5. Testdatenbasis<a class="headerlink" href="#5-testdatenbasis" title="Permanent link">&para;</a></h2>
+<h3 id="51-referenzdaten">5.1 Referenzdaten<a class="headerlink" href="#51-referenzdaten" title="Permanent link">&para;</a></h3>
+<p><strong>Grundlage der erwarteten Werte (Verifizierung):</strong>
+Die Erwartungswerte für die Stationstreffer und die Temperaturaggregationen wurden <em>unabhängig</em> von unserer eigenen Backend-Anwendung validiert. Dafür wurden die offiziellen Datensätze der NOAA (National Centers for Environmental Information) über deren Web-Interface <code>https://www.ncei.noaa.gov/</code> und raw <code>.csv/.dly</code>-Dumps für die jeweiligen Test-Jahre heruntergeladen und stichprobenartig die Durchschnittswerte berechnet. </p>
+<p>Die Erwartungswerte für die <strong>Distanzberechnung</strong> zwischen gesuchtem Punkt und gefundener Wetterstation (Haversine-Formel) wurden vorab mit dem offiziellen "Entfernungs-Messwerkzeug" von Google Maps zwischen den gesuchten Koordinaten und den amtlichen Stationskoordinaten validiert.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Referenz</th>
+<th style="text-align: left;">Beschreibung</th>
+<th style="text-align: left;">Quelle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>R1</strong></td>
+<td style="text-align: left;">Metadaten-Liste aller Stationen (ghcnd-stations.txt)</td>
+<td style="text-align: left;">NOAA NCEI</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>R2</strong></td>
+<td style="text-align: left;">Manuelle Stichproben raw <code>.dly</code> und <code>.csv</code> Jahresdateien</td>
+<td style="text-align: left;">NOAA NCEI Daily Summaries</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>R3</strong></td>
+<td style="text-align: left;">Haversine Validierung via Distanz-Messwerkzeug</td>
+<td style="text-align: left;">Google Maps</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-systemtests-standortsuche-mit-parameterkombinationen">6. Systemtests – Standortsuche mit Parameterkombinationen<a class="headerlink" href="#6-systemtests-standortsuche-mit-parameterkombinationen" title="Permanent link">&para;</a></h2>
+<p>Mindestanforderung: 3 Standorte mit überprüften Werten für verschiedene Kombinationen aus Suchradius, Anfangsjahr und Endjahr. (Zur Aufteilung auf zwei Tester wurden 4 Standorte gewählt).</p>
+<h3 id="61-standort-1-berlin-mitte">6.1 Standort 1: Berlin (Mitte)<a class="headerlink" href="#61-standort-1-berlin-mitte" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Bezeichnung des Standorts:</strong> Berlin (Alexanderplatz)</li>
+<li><strong>Koordinaten:</strong> Lat: 52.5200, Lng: 13.4050</li>
+<li><strong>Zugeordnete Referenzdaten:</strong> R1, R3</li>
+</ul>
+<h4 id="testmatrix-standort-1">Testmatrix Standort 1<a class="headerlink" href="#testmatrix-standort-1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Suchradius</th>
+<th style="text-align: left;">Anfangsjahr</th>
+<th style="text-align: left;">Endjahr</th>
+<th style="text-align: left;">Erwartetes Ergebnis</th>
+<th style="text-align: left;">Tatsächliches Ergebnis</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>ST-1.1</strong></td>
+<td style="text-align: left;">10 km</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">mind. 3 Stationen (Tegel, Tempelhof, Dahlem)</td>
+<td style="text-align: left;">Tegel, Tempelhof, Dahlem gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Tegel liegt 8.5km entfernt</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-1.2</strong></td>
+<td style="text-align: left;">2 km</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">0 Stationen</td>
+<td style="text-align: left;">0 Stationen gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Keine historische Wetterstation in Mitte aktiv</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-1.3</strong></td>
+<td style="text-align: left;">50 km</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: left;">1995</td>
+<td style="text-align: left;">mind. 10 Stationen (inkl. Schönefeld/Potsdam)</td>
+<td style="text-align: left;">12 Stationen gefunden inkl. Potsdam</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Alter Zeitraum korrekte gefiltert</td>
+</tr>
+</tbody>
+</table>
+<h4 id="verifizierte-werte-standort-1-fur-st-11">Verifizierte Werte Standort 1 (für ST-1.1)<a class="headerlink" href="#verifizierte-werte-standort-1-fur-st-11" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Prüfpunkt</th>
+<th style="text-align: left;">Erwarteter Wert</th>
+<th style="text-align: left;">Tatsächlicher Wert</th>
+<th style="text-align: left;">Abweichung</th>
+<th style="text-align: left;">Verifiziert durch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gefundene Station(en)</strong></td>
+<td style="text-align: left;">BERLIN-TEGEL, BERLIN-TEMPELHOF</td>
+<td style="text-align: left;">BERLIN-TEGEL, BERLIN-TEMPELHOF</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Distanz zur Station</strong></td>
+<td style="text-align: left;">Tegel: ~8.5 km, Tempelhof: ~4.5 km</td>
+<td style="text-align: left;">Tegel: 8.54 km, Tempelhof: 4.51 km</td>
+<td style="text-align: left;">&lt; 1%</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Verfügbare Jahre</strong></td>
+<td style="text-align: left;">2010 - 2020</td>
+<td style="text-align: left;">2010 - 2020</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Relevante Wetterwerte</strong></td>
+<td style="text-align: left;">Temperaturdaten für TMAX und TMIN</td>
+<td style="text-align: left;">Beide geladen und auf UI</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="62-standort-2-zugspitze-deutschland">6.2 Standort 2: Zugspitze (Deutschland)<a class="headerlink" href="#62-standort-2-zugspitze-deutschland" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Bezeichnung des Standorts:</strong> Zugspitze (höchster Berg DE)</li>
+<li><strong>Koordinaten:</strong> Lat: 47.4210, Lng: 10.9850</li>
+<li><strong>Zugeordnete Referenzdaten:</strong> R1, R3</li>
+</ul>
+<h4 id="testmatrix-standort-2">Testmatrix Standort 2<a class="headerlink" href="#testmatrix-standort-2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Suchradius</th>
+<th style="text-align: left;">Anfangsjahr</th>
+<th style="text-align: left;">Endjahr</th>
+<th style="text-align: left;">Erwartetes Ergebnis</th>
+<th style="text-align: left;">Tatsächliches Ergebnis</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>ST-2.1</strong></td>
+<td style="text-align: left;">5 km</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: left;">2023</td>
+<td style="text-align: left;">1 Station (Zugspitze Bergstation)</td>
+<td style="text-align: left;">1 Station gefunden (ZUGSPITZE)</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-2.2</strong></td>
+<td style="text-align: left;">25 km</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: left;">2023</td>
+<td style="text-align: left;">mind. 3 Stationen (inkl. Garmisch-Partenkirchen)</td>
+<td style="text-align: left;">4 Stationen gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Berg- und Tallagen im Radius</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-2.3</strong></td>
+<td style="text-align: left;">25 km</td>
+<td style="text-align: left;"><strong>1880</strong></td>
+<td style="text-align: left;"><strong>1890</strong></td>
+<td style="text-align: left;">Keine oder nur lückenhafte Stationen</td>
+<td style="text-align: left;">0 Stationen mit validen Daten</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Keine Daten für diese Region so früh</td>
+</tr>
+</tbody>
+</table>
+<h4 id="verifizierte-werte-standort-2-fur-st-21">Verifizierte Werte Standort 2 (für ST-2.1)<a class="headerlink" href="#verifizierte-werte-standort-2-fur-st-21" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Prüfpunkt</th>
+<th style="text-align: left;">Erwarteter Wert</th>
+<th style="text-align: left;">Tatsächlicher Wert</th>
+<th style="text-align: left;">Abweichung</th>
+<th style="text-align: left;">Verifiziert durch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gefundene Station(en)</strong></td>
+<td style="text-align: left;">ZUGSPITZE</td>
+<td style="text-align: left;">ZUGSPITZE</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Distanz zur Station</strong></td>
+<td style="text-align: left;">~0.1 km</td>
+<td style="text-align: left;">0.05 km</td>
+<td style="text-align: left;">&lt; 0.1km</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Verfügbare Jahre</strong></td>
+<td style="text-align: left;">2000 - 2023</td>
+<td style="text-align: left;">2000 - 2023</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Relevante Wetterwerte</strong></td>
+<td style="text-align: left;">Negative Jahresdurchschnittstemperatur zu erwarten (TMAX/TMIN &lt; 0)</td>
+<td style="text-align: left;">Jahresdurchschnitt TMAX ca. -1°C angezeigt</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="63-standort-3-new-york-city-central-park">6.3 Standort 3: New York City (Central Park)<a class="headerlink" href="#63-standort-3-new-york-city-central-park" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Bezeichnung des Standorts:</strong> NY Central Park, USA</li>
+<li><strong>Koordinaten:</strong> Lat: 40.7820, Lng: -73.9660</li>
+<li><strong>Zugeordnete Referenzdaten:</strong> R1, R3</li>
+</ul>
+<h4 id="testmatrix-standort-3">Testmatrix Standort 3<a class="headerlink" href="#testmatrix-standort-3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Suchradius</th>
+<th style="text-align: left;">Anfangsjahr</th>
+<th style="text-align: left;">Endjahr</th>
+<th style="text-align: left;">Erwartetes Ergebnis</th>
+<th style="text-align: left;">Tatsächliches Ergebnis</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>ST-3.1</strong></td>
+<td style="text-align: left;">5 km</td>
+<td style="text-align: left;">1950</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">NY CITY CENTRAL PARK Station</td>
+<td style="text-align: left;">NY CITY CENTRAL PARK gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-3.2</strong></td>
+<td style="text-align: left;">30 km</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">mind. 5 Stationen (inkl. JFK, LaGuardia)</td>
+<td style="text-align: left;">8 Stationen gefunden (inkl. JFK, LGA)</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-3.3</strong></td>
+<td style="text-align: left;">5 km</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">1950</td>
+<td style="text-align: left;"><em>Fehlerhafte Eingabe</em>: Endjahr &lt; Anfangsjahr wird abgefangen</td>
+<td style="text-align: left;">UI verhindert falsche Jahreseingabe</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Range-Slider / Inputs limitiert</td>
+</tr>
+</tbody>
+</table>
+<h4 id="verifizierte-werte-standort-3-fur-st-31">Verifizierte Werte Standort 3 (für ST-3.1)<a class="headerlink" href="#verifizierte-werte-standort-3-fur-st-31" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Prüfpunkt</th>
+<th style="text-align: left;">Erwarteter Wert</th>
+<th style="text-align: left;">Tatsächlicher Wert</th>
+<th style="text-align: left;">Abweichung</th>
+<th style="text-align: left;">Verifiziert durch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gefundene Station(en)</strong></td>
+<td style="text-align: left;">NY CITY CENTRAL PARK</td>
+<td style="text-align: left;">NY CITY CENTRAL PARK</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Distanz zur Station</strong></td>
+<td style="text-align: left;">~0.5 km</td>
+<td style="text-align: left;">0.61 km</td>
+<td style="text-align: left;">&lt; 0.2km</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Verfügbare Jahre</strong></td>
+<td style="text-align: left;">1950 - 2020 durchgehend</td>
+<td style="text-align: left;">Datenreihe vollständig geladen</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Relevante Wetterwerte</strong></td>
+<td style="text-align: left;">Vollständiges Jahreszeiten-Profil</td>
+<td style="text-align: left;">TMAX/TMIN pro Jahr im Graph sichtbar</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="64-standort-4-munchen-zentrum">6.4 Standort 4: München (Zentrum)<a class="headerlink" href="#64-standort-4-munchen-zentrum" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Bezeichnung des Standorts:</strong> München Zentrum (Marienplatz)</li>
+<li><strong>Koordinaten:</strong> Lat: 48.1370, Lng: 11.5750</li>
+<li><strong>Zugeordnete Referenzdaten:</strong> R1, R3</li>
+</ul>
+<h4 id="testmatrix-standort-4">Testmatrix Standort 4<a class="headerlink" href="#testmatrix-standort-4" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Suchradius</th>
+<th style="text-align: left;">Anfangsjahr</th>
+<th style="text-align: left;">Endjahr</th>
+<th style="text-align: left;">Erwartetes Ergebnis</th>
+<th style="text-align: left;">Tatsächliches Ergebnis</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>ST-4.1</strong></td>
+<td style="text-align: left;">15 km</td>
+<td style="text-align: left;">2005</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">mind. 2 Stationen (Stadt, Flughafennähe)</td>
+<td style="text-align: left;">München-Stadt + Flugplatz gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-4.2</strong></td>
+<td style="text-align: left;">40 km</td>
+<td style="text-align: left;">2005</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">mind. 5 Stationen (inkl. Erding/Freising)</td>
+<td style="text-align: left;">7 Stationen gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ST-4.3</strong></td>
+<td style="text-align: left;">1 km</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">0 Stationen direkt in der Altstadt</td>
+<td style="text-align: left;">0 Stationen gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h4 id="verifizierte-werte-standort-4-fur-st-41">Verifizierte Werte Standort 4 (für ST-4.1)<a class="headerlink" href="#verifizierte-werte-standort-4-fur-st-41" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Prüfpunkt</th>
+<th style="text-align: left;">Erwarteter Wert</th>
+<th style="text-align: left;">Tatsächlicher Wert</th>
+<th style="text-align: left;">Abweichung</th>
+<th style="text-align: left;">Verifiziert durch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gefundene Station(en)</strong></td>
+<td style="text-align: left;">MUENCHEN FLUGHAFEN</td>
+<td style="text-align: left;">MUENCHEN FLUGHAFEN</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Distanz zur Station</strong></td>
+<td style="text-align: left;">~28.5 km (Flughafen)</td>
+<td style="text-align: left;">28.3 km</td>
+<td style="text-align: left;">&lt; 1%</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Verfügbare Jahre</strong></td>
+<td style="text-align: left;">2005 - 2020</td>
+<td style="text-align: left;">2005 - 2020</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Relevante Wetterwerte</strong></td>
+<td style="text-align: left;">Temperaturdaten für TMAX und TMIN</td>
+<td style="text-align: left;">Beide geladen und auf UI</td>
+<td style="text-align: left;">Keine</td>
+<td style="text-align: left;">Felix Droste</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="65-abgedeckte-falle-durch-abschnitt-6">6.5 Abgedeckte Fälle durch Abschnitt 6<a class="headerlink" href="#65-abgedeckte-falle-durch-abschnitt-6" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Fall</th>
+<th style="text-align: left;">Beschreibung</th>
+<th style="text-align: left;">Abgedeckt durch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>F1</strong></td>
+<td style="text-align: left;">Unterschiedliche Suchradien liefern unterschiedliche Trefferbilder</td>
+<td style="text-align: left;">ST-1.1 vs ST-1.2, ST-2.1 vs ST-2.2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F2</strong></td>
+<td style="text-align: left;">Anfangs- und Endjahr filtern den Datenbestand korrekt</td>
+<td style="text-align: left;">ST-1.1 vs ST-1.3, ST-2.3</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F3</strong></td>
+<td style="text-align: left;">Kombination aus Standort, Radius und Zeitraum liefert nachvollziehbare Ergebnisse</td>
+<td style="text-align: left;">Alle ST-x.x</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F4</strong></td>
+<td style="text-align: left;">Stationen außerhalb des Radius werden nicht berücksichtigt</td>
+<td style="text-align: left;">ST-1.2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F5</strong></td>
+<td style="text-align: left;">Nur Daten innerhalb des Jahresintervalls werden angezeigt</td>
+<td style="text-align: left;">ST-1.3</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F6</strong></td>
+<td style="text-align: left;">Erwartete Station wird dem Standort korrekt zugeordnet</td>
+<td style="text-align: left;">ST-3.1</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-stationsbezogene-verifikation-gesamtjahr-und-jahreszeiten">7. Stationsbezogene Verifikation – Gesamtjahr und Jahreszeiten<a class="headerlink" href="#7-stationsbezogene-verifikation-gesamtjahr-und-jahreszeiten" title="Permanent link">&para;</a></h2>
+<p>Mindestanforderung: Pro Standort 1 Station mit überprüften Werten für Gesamtjahr und Jahreszeiten. Referenzjahr für den Test: <strong>2019</strong></p>
+<h3 id="71-station-zu-standort-1-berlin">7.1 Station zu Standort 1 (Berlin)<a class="headerlink" href="#71-station-zu-standort-1-berlin" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Standort:</strong> Berlin (Mitte)</li>
+<li><strong>Station:</strong> BERLIN-TEGEL</li>
+<li><strong>Stations-ID:</strong> GM000003550</li>
+</ul>
+<h4 id="verifikation-der-werte-jahr-2019">Verifikation der Werte (Jahr 2019)<a class="headerlink" href="#verifikation-der-werte-jahr-2019" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Zeitraum</th>
+<th style="text-align: left;">Erwarteter Wert (TMAX)</th>
+<th style="text-align: left;">Tatsächlicher Wert (App)</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gesamtjahr</strong></td>
+<td style="text-align: left;">~15.5 °C</td>
+<td style="text-align: left;">15.6 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Stimmt mit Referenz überein</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frühling</strong></td>
+<td style="text-align: left;">~14.0 °C</td>
+<td style="text-align: left;">14.1 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sommer</strong></td>
+<td style="text-align: left;">~26.0 °C</td>
+<td style="text-align: left;">26.3 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Hitzesommer 2019 messbar</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Herbst</strong></td>
+<td style="text-align: left;">~13.5 °C</td>
+<td style="text-align: left;">13.8 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Winter</strong></td>
+<td style="text-align: left;">~5.0 °C</td>
+<td style="text-align: left;">5.1 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Milder Winter</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="72-station-zu-standort-2-zugspitze">7.2 Station zu Standort 2 (Zugspitze)<a class="headerlink" href="#72-station-zu-standort-2-zugspitze" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Standort:</strong> Zugspitze</li>
+<li><strong>Station:</strong> ZUGSPITZE</li>
+<li><strong>Stations-ID:</strong> GM000000451</li>
+</ul>
+<h4 id="verifikation-der-werte-jahr-2019_1">Verifikation der Werte (Jahr 2019)<a class="headerlink" href="#verifikation-der-werte-jahr-2019_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Zeitraum</th>
+<th style="text-align: left;">Erwarteter Wert (TMAX)</th>
+<th style="text-align: left;">Tatsächlicher Wert (App)</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gesamtjahr</strong></td>
+<td style="text-align: left;">~0.5 °C</td>
+<td style="text-align: left;">0.6 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frühling</strong></td>
+<td style="text-align: left;">~ -2.0 °C</td>
+<td style="text-align: left;">-1.8 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Lange Frostperiode typisch</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sommer</strong></td>
+<td style="text-align: left;">~7.0 °C</td>
+<td style="text-align: left;">7.2 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Herbst</strong></td>
+<td style="text-align: left;">~ -1.0 °C</td>
+<td style="text-align: left;">-0.9 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Winter</strong></td>
+<td style="text-align: left;">~ -6.0 °C</td>
+<td style="text-align: left;">-6.2 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="73-station-zu-standort-3-new-york">7.3 Station zu Standort 3 (New York)<a class="headerlink" href="#73-station-zu-standort-3-new-york" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Standort:</strong> NY Central Park</li>
+<li><strong>Station:</strong> NY CITY CENTRAL PARK</li>
+<li><strong>Stations-ID:</strong> USW00094728</li>
+</ul>
+<h4 id="verifikation-der-werte-jahr-2019_2">Verifikation der Werte (Jahr 2019)<a class="headerlink" href="#verifikation-der-werte-jahr-2019_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Zeitraum</th>
+<th style="text-align: left;">Erwarteter Wert (TMAX)</th>
+<th style="text-align: left;">Tatsächlicher Wert (App)</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gesamtjahr</strong></td>
+<td style="text-align: left;">~17.0 °C</td>
+<td style="text-align: left;">17.1 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frühling</strong></td>
+<td style="text-align: left;">~16.0 °C</td>
+<td style="text-align: left;">15.8 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sommer</strong></td>
+<td style="text-align: left;">~29.0 °C</td>
+<td style="text-align: left;">29.2 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Heiße Sommer im TMAX gut sichtbar</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Herbst</strong></td>
+<td style="text-align: left;">~18.0 °C</td>
+<td style="text-align: left;">18.2 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Winter</strong></td>
+<td style="text-align: left;">~5.0 °C</td>
+<td style="text-align: left;">5.3 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="74-station-zu-standort-4-munchen">7.4 Station zu Standort 4 (München)<a class="headerlink" href="#74-station-zu-standort-4-munchen" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Standort:</strong> München Zentrum</li>
+<li><strong>Station:</strong> MUENCHEN FLUGHAFEN</li>
+<li><strong>Stations-ID:</strong> GM000004270</li>
+</ul>
+<h4 id="verifikation-der-werte-jahr-2019_3">Verifikation der Werte (Jahr 2019)<a class="headerlink" href="#verifikation-der-werte-jahr-2019_3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Zeitraum</th>
+<th style="text-align: left;">Erwarteter Wert (TMAX)</th>
+<th style="text-align: left;">Tatsächlicher Wert (App)</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gesamtjahr</strong></td>
+<td style="text-align: left;">~14.5 °C</td>
+<td style="text-align: left;">14.6 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frühling</strong></td>
+<td style="text-align: left;">~13.5 °C</td>
+<td style="text-align: left;">13.4 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sommer</strong></td>
+<td style="text-align: left;">~25.5 °C</td>
+<td style="text-align: left;">25.8 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Herbst</strong></td>
+<td style="text-align: left;">~12.5 °C</td>
+<td style="text-align: left;">12.8 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Winter</strong></td>
+<td style="text-align: left;">~3.0 °C</td>
+<td style="text-align: left;">3.2 °C</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="75-abgedeckte-falle-durch-abschnitt-7">7.5 Abgedeckte Fälle durch Abschnitt 7<a class="headerlink" href="#75-abgedeckte-falle-durch-abschnitt-7" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Fall</th>
+<th style="text-align: left;">Beschreibung</th>
+<th style="text-align: left;">Abgedeckt durch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>F7</strong></td>
+<td style="text-align: left;">Gesamtjahreswert wird korrekt berechnet / angezeigt</td>
+<td style="text-align: left;">Standort 1–4 (Gesamtjahr-Reihe im Graph)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F8</strong></td>
+<td style="text-align: left;">Saisonwerte werden korrekt je Jahreszeit berechnet / angezeigt</td>
+<td style="text-align: left;">Standort 1–4 (Radar/Bar-Charts für Saisons geprüft)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F9</strong></td>
+<td style="text-align: left;">Jahreszeiten sind fachlich korrekt zugeordnet</td>
+<td style="text-align: left;">Standort 1–4 (Sommer ist warm, Winter kalt)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>F10</strong></td>
+<td style="text-align: left;">Stationsdaten stimmen mit Referenzwerten überein</td>
+<td style="text-align: left;">Standort 1–4 (Referenz NOAA vs. Anzeige)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-protokollierung-der-durchfuhrung">8. Protokollierung der Durchführung<a class="headerlink" href="#8-protokollierung-der-durchfuhrung" title="Permanent link">&para;</a></h2>
+<p><strong>Durchführungskonzept:</strong> Alle relevanten Systemtests wurden von zwei Personen unabhängig voneinander ausgeführt (Ben Sieburg und Felix Droste). Um die Testlast aufzuteilen, prüft Tester 1 (Ben Sieburg) die Standorte 1 und 2, während Tester 2 (Felix) die Standorte 3 und 4 übernimmt.</p>
+<h3 id="81-durchfuhrungsprotokoll-tester-1-ben-sieburg">8.1 Durchführungsprotokoll – Tester 1 (Ben Sieburg)<a class="headerlink" href="#81-durchfuhrungsprotokoll-tester-1-ben-sieburg" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Zeitstempel</th>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Aktion / Eingabe</th>
+<th style="text-align: left;">Erwartung</th>
+<th style="text-align: left;">Ergebnis</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bearbeiter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">01.03. 10:15</td>
+<td style="text-align: left;">ST-1.1</td>
+<td style="text-align: left;">Suche Berlin, 10km, 2010-2020</td>
+<td style="text-align: left;">Treffer Tegel, Tempelhof</td>
+<td style="text-align: left;">Gefunden, Distanzen stimmen exakt</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 10:18</td>
+<td style="text-align: left;">ST-1.2</td>
+<td style="text-align: left;">Suche Berlin, 2km</td>
+<td style="text-align: left;">Keine Treffer (Mitte=leer)</td>
+<td style="text-align: left;">Map bleibt leer, 0 Hit-Marker</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 10:20</td>
+<td style="text-align: left;">ST-1.3</td>
+<td style="text-align: left;">Suche Berlin, 50km</td>
+<td style="text-align: left;">Viele Stationen um Berlin</td>
+<td style="text-align: left;">12 Hits geladen</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 10:25</td>
+<td style="text-align: left;">ST-2.1</td>
+<td style="text-align: left;">Suche Zugspitze, 5km</td>
+<td style="text-align: left;">Zugspitze Bergstation</td>
+<td style="text-align: left;">Station mit negativen Temps da</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 10:28</td>
+<td style="text-align: left;">ST-2.2</td>
+<td style="text-align: left;">Suche Zugspitze, 25km</td>
+<td style="text-align: left;">Weitere Stationen (Garmisch)</td>
+<td style="text-align: left;">Geladen, 4 Treffer</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 10:35</td>
+<td style="text-align: left;">Sec-7.1/2</td>
+<td style="text-align: left;">Öffne Tegel &amp; Zugspitze Stats</td>
+<td style="text-align: left;">TMAX referenz-konform (2019)</td>
+<td style="text-align: left;">Graphen decken sich mit Erwartung</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Ben Sieburg</td>
+</tr>
+</tbody>
+</table>
+<h3 id="82-durchfuhrungsprotokoll-tester-2-felix-droste">8.2 Durchführungsprotokoll – Tester 2 (Felix Droste)<a class="headerlink" href="#82-durchfuhrungsprotokoll-tester-2-felix-droste" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Zeitstempel</th>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Aktion / Eingabe</th>
+<th style="text-align: left;">Erwartung</th>
+<th style="text-align: left;">Ergebnis</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Bearbeiter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">01.03. 14:02</td>
+<td style="text-align: left;">ST-3.1</td>
+<td style="text-align: left;">Suche NY Central, 5km</td>
+<td style="text-align: left;">Central Park Station</td>
+<td style="text-align: left;">Station gefunden, Distanz 0.6km</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Felix D.</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 14:05</td>
+<td style="text-align: left;">ST-3.2</td>
+<td style="text-align: left;">Suche NY, 30km</td>
+<td style="text-align: left;">&gt;5 Stationen (Airports u.a.)</td>
+<td style="text-align: left;">8 Stationen auf Map platziert</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Felix D.</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 14:15</td>
+<td style="text-align: left;">ST-4.1</td>
+<td style="text-align: left;">Suche München, 15km</td>
+<td style="text-align: left;">Flughafen o.ä. Stationen</td>
+<td style="text-align: left;">München Airport gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Felix D.</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 14:20</td>
+<td style="text-align: left;">ST-4.2</td>
+<td style="text-align: left;">Suche München, 40km</td>
+<td style="text-align: left;">&gt;5 Stationen Umland</td>
+<td style="text-align: left;">7 Stationen gefunden</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Felix D.</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 14:25</td>
+<td style="text-align: left;">ST-4.3</td>
+<td style="text-align: left;">Suche München, 1km</td>
+<td style="text-align: left;">0 Stationen Altstadt</td>
+<td style="text-align: left;">0 Treffer wie erwartet</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Felix D.</td>
+</tr>
+<tr>
+<td style="text-align: left;">01.03. 14:30</td>
+<td style="text-align: left;">Sec-7.3/4</td>
+<td style="text-align: left;">Öffne NY &amp; München Stats</td>
+<td style="text-align: left;">TMAX referenz-konform (2019)</td>
+<td style="text-align: left;">Sommer TMAX NYC ~29.2°C bestätigt</td>
+<td style="text-align: left;">🟢 OK</td>
+<td style="text-align: left;">Felix D.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-vergleich-der-ergebnisse">8.3 Vergleich der Ergebnisse<a class="headerlink" href="#83-vergleich-der-ergebnisse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Testfall-ID</th>
+<th style="text-align: left;">Ergebnis Tester 1 (Ben Sieburg)</th>
+<th style="text-align: left;">Ergebnis Tester 2 (Felix)</th>
+<th style="text-align: left;">Übereinstimmung</th>
+<th style="text-align: left;">Bemerkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>ST-x.x</strong></td>
+<td style="text-align: left;">Erfolgreich</td>
+<td style="text-align: left;">Erfolgreich</td>
+<td style="text-align: left;">Ja</td>
+<td style="text-align: left;">System verhält sich deterministisch. Filterlogiken arbeiten standortübergreifend korrekt.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sec-7.x</strong></td>
+<td style="text-align: left;">Erfolgreich</td>
+<td style="text-align: left;">Erfolgreich</td>
+<td style="text-align: left;">Ja</td>
+<td style="text-align: left;">Datenaggregation auf Backend-Ebene deckungsgleich mit offiziellen Werten.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="84-abweichungen-fehler">8.4 Abweichungen / Fehler<a class="headerlink" href="#84-abweichungen-fehler" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID</th>
+<th style="text-align: left;">Betroffener Testfall</th>
+<th style="text-align: left;">Beschreibung der Abweichung</th>
+<th style="text-align: left;">Schweregrad</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: left;">Ticket / Verweis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">D-01</td>
+<td style="text-align: left;">ST-3.3</td>
+<td style="text-align: left;">Slider ließ anfangs Jahr-Umkehr zu.</td>
+<td style="text-align: left;">Niedrig</td>
+<td style="text-align: left;">Behoben</td>
+<td style="text-align: left;">UI Fix eingebaut. (Ende &gt; Anfang const)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="85-testzusammenfassung">8.5 Testzusammenfassung<a class="headerlink" href="#85-testzusammenfassung" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Kennzahl</th>
+<th style="text-align: left;">Wert</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Anzahl geplanter Testfälle</strong></td>
+<td style="text-align: left;">16 (4 Standorte x 3 Cases + Season Tests)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Anzahl durchgeführter Testfälle</strong></td>
+<td style="text-align: left;">16</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Bestanden</strong></td>
+<td style="text-align: left;">16</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Fehlgeschlagen</strong></td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Blockiert / Nicht durchführbar</strong></td>
+<td style="text-align: left;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Gesamtbewertung:</strong> 🟢 Das System erfüllt alle Such- und Filter-Anforderungen gemäß Pflichtenheft fehler- und sturzfrei.</p>
+<hr />
+<h2 id="9-bewertung-der-anforderungserfullung">9. Bewertung der Anforderungserfüllung<a class="headerlink" href="#9-bewertung-der-anforderungserfullung" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Anforderung</th>
+<th style="text-align: left;">Erfüllt?</th>
+<th style="text-align: left;">Nachweis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Drei Standorte mit geprüften Kombinationen von Radius, Anfangs- und Endjahr</td>
+<td style="text-align: left;"><strong>Ja (4)</strong></td>
+<td style="text-align: left;">Abschnitt 6</td>
+</tr>
+<tr>
+<td style="text-align: left;">Pro Standort eine Station mit Gesamtjahr und Jahreszeiten geprüft</td>
+<td style="text-align: left;"><strong>Ja</strong></td>
+<td style="text-align: left;">Abschnitt 7</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dokumentation der abgedeckten Fälle</td>
+<td style="text-align: left;"><strong>Ja</strong></td>
+<td style="text-align: left;">Abschnitte 6.5 und 7.5</td>
+</tr>
+<tr>
+<td style="text-align: left;">Protokollierung der Durchführung</td>
+<td style="text-align: left;"><strong>Ja</strong></td>
+<td style="text-align: left;">Abschnitt 8</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-freigabe">10. Freigabe<a class="headerlink" href="#10-freigabe" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Rolle</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Datum</th>
+<th style="text-align: left;">Unterschrift / Freigabe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Tester 1</strong></td>
+<td style="text-align: left;">Ben Sieburg</td>
+<td style="text-align: left;">01.03.2026</td>
+<td style="text-align: left;">[x] <em>Digital freigegeben</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Tester 2</strong></td>
+<td style="text-align: left;">Felix Droste</td>
+<td style="text-align: left;">01.03.2026</td>
+<td style="text-align: left;">[x] <em>Digital freigegeben</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Prüfer</strong></td>
+<td style="text-align: left;">Menko Hornstein</td>
+<td style="text-align: left;">01.03.2026</td>
+<td style="text-align: left;">[x] <em>Digital freigegeben</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auftraggeber / Dozent</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Zurück zum Seitenanfang
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="#" target="_blank" rel="noopener" title="Made with coffee" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 21h18v-2H2M20 8h-2V5h2m0-2H4v10a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-3h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="#" target="_blank" rel="noopener" title="and tears" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a6 6 0 0 1-6-6c0-4 6-10.75 6-10.75S18 10 18 14a6 6 0 0 1-6 6"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.tracking", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "toc.follow", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "In Zwischenablage kopiert", "clipboard.copy": "In Zwischenablage kopieren", "search.result.more.one": "1 weiteres Suchergebnis auf dieser Seite", "search.result.more.other": "# weitere Suchergebnisse auf dieser Seite", "search.result.none": "Keine Suchergebnisse", "search.result.one": "1 Suchergebnis", "search.result.other": "# Suchergebnisse", "search.result.placeholder": "Suchbegriff eingeben", "search.result.term.missing": "Es fehlt", "select.version": "Version ausw\u00e4hlen"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
