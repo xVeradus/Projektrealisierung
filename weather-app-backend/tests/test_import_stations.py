@@ -149,7 +149,8 @@ def test_ensure_stations_imported_runs_import():
     """
     with patch("sqlite3.connect") as mock_connect, \
          patch("app.import_stations.download_file") as mock_dl, \
-         patch("app.import_stations.import_stations") as mock_import:
+         patch("app.import_stations.import_stations") as mock_import, \
+         patch("app.import_stations.import_inventory") as mock_inventory:
          
         mock_conn = MagicMock()
         mock_connect.return_value = mock_conn
@@ -168,6 +169,7 @@ def test_ensure_stations_imported_runs_import():
         assert res["stations_count"] == 50
         assert mock_dl.called
         assert mock_import.called
+        assert mock_inventory.called
 
 # -------------------------------------------------------------------
 # 4. Main Execution & Batching Tests
@@ -199,7 +201,8 @@ def test_import_stations_main_logic():
     from app.import_stations import main as import_stations_main
     with patch("app.import_stations.download_file") as mock_dl, \
          patch("sqlite3.connect") as mock_connect, \
-         patch("app.import_stations.import_stations"):
+         patch("app.import_stations.import_stations"), \
+         patch("app.import_stations.import_inventory"):
          
         import_stations_main()
         
@@ -213,7 +216,8 @@ def test_import_stations_main_fallback_logic():
     from app.import_stations import main as import_stations_main
     with patch("app.import_stations.download_file") as mock_dl, \
          patch("sqlite3.connect"), \
-         patch("app.import_stations.import_stations"):
+         patch("app.import_stations.import_stations"), \
+         patch("app.import_stations.import_inventory"):
          
         # First call fails, second succeeds
         mock_dl.side_effect = [Exception("Primary URL Fail"), None, Exception("Primary inventory fail"), None, None]
