@@ -1,0 +1,400 @@
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, DestroyRef, ViewEncapsulation, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { ChartModule, UIChart } from 'primeng/chart';
+import { SelectModule } from 'primeng/select';
+import { SliderModule } from 'primeng/slider';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TableModule } from 'primeng/table';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { Subscription } from 'rxjs';
+import { WeatherApiService, TempRow, Period } from '../weather-api.service';
+import { StationUiStateService } from '../map-view/map-station';
+
+/**
+ * Displays detailed temperature data for a selected station in a modal dialog.
+ * Handles data fetching, processing for Chart.js and DataTables, and UI controls
+ * for toggling visibility of various metrics and periods.
+ */
+@Component({
+  selector: 'pop-up-display',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DialogModule, ChartModule, SelectModule, SliderModule, InputNumberModule, CheckboxModule, ProgressSpinnerModule, TableModule, ToggleButtonModule],
+  templateUrl: './pop-up-display.html',
+  styleUrl: './pop-up-display.css',
+  encapsulation: ViewEncapsulation.None,
+})
+export class PopUpDisplayComponent implements OnChanges {
+  @Input() visible = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
+
+  @ViewChild('chart') chart: UIChart | undefined;
+
+  @Input() initialRange: [number, number] | null = null;
+  @Input() stationId: string | null = null;
+  stationName: string | null = null;
+
+  private cdr = inject(ChangeDetectorRef);
+  private ui = inject(StationUiStateService);
+  private destroyRef = inject(DestroyRef);
+  private loadSubscription?: Subscription;
+
+  currentRange: { start: number; end: number } = { start: 1980, end: 2025 };
+  minYear = 1900;
+  maxYear = 2025;
+  selectedRange: [number, number] = [1980, 2025];
+  showTmax = true;
+  showTmin = true;
+  loading = false;
+  hasVisibleData = false;
+  error: string | null = null;
+  isTableView = false;
+
+  selectedPeriods: Period[] = ['annual'];
+  periodOptions: { label: string; value: Period }[] = [
+    { label: 'Annual', value: 'annual' },
+    { label: 'Winter', value: 'winter' },
+    { label: 'Spring', value: 'spring' },
+    { label: 'Summer', value: 'summer' },
+    { label: 'Autumn', value: 'autumn' },
+  ];
+
+  periodColors: Record<Period, { tmax: string; tmin: string }> = {
+    annual: { tmax: '#ef4444', tmin: '#3b82f6' },
+    spring: { tmax: '#16a34a', tmin: '#86efac' },
+    summer: { tmax: '#f97316', tmin: '#fbbf24' },
+    autumn: { tmax: '#78350f', tmin: '#d6d3d1' },
+    winter: { tmax: '#0ea5e9', tmin: '#a855f7' },
+  };
+
+  rowsCache: TempRow[] = [];
+
+  chartData: any;
+  chartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(30, 41, 59, 0.9)',
+        titleFont: { size: 14, weight: 'bold' },
+        bodyFont: { size: 13 },
+        padding: 12,
+        cornerRadius: 8,
+        displayColors: true,
+      },
+      crosshair: {
+        color: '#64748b',
+        width: 1,
+      }
+    }
+  };
+
+  public crosshairPlugin = {
+    id: 'crosshair',
+    afterDraw: (chart: any) => {
+      if (chart.tooltip?._active?.length) {
+        const x = chart.tooltip._active[0].element.x;
+        const yAxis = chart.scales.y;
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x, yAxis.top);
+        ctx.lineTo(x, yAxis.bottom);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#64748b';
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  };
+
+  constructor(private api: WeatherApiService) { }
+
+  /**
+   * Responds to changes in input properties.
+   * Resets local component state and determines if new data must be loaded when 
+   * a different station is selected.
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    const relevant = changes['stationId'];
+
+    if (this.visible && relevant) {
+      // 1. Reset standard ui toggles/state for new station
+      this.selectedPeriods = ['annual'];
+      this.showTmax = true;
+      this.showTmin = true;
+      this.isTableView = false;
+      this.hasVisibleData = false;
+
+      // 2. Adjust time range based on "Show all Results" logic:
+      // If initialRange is NOT null, it means the toggle is OFF -> use provided exact range
+      // If initialRange IS null, it means the toggle is ON -> use max available bounds
+      if (this.initialRange) {
+        this.currentRange = { start: this.initialRange[0], end: this.initialRange[1] };
+        this.selectedRange = [...this.initialRange];
+      } else {
+        this.currentRange = { start: 1900, end: 2025 };
+        this.selectedRange = [1900, 2025];
+      }
+
+      this.load();
+    }
+  }
+
+  onVisibleChange(v: boolean): void {
+    this.visible = v;
+    this.visibleChange.emit(v);
+  }
+
+  /**
+   * Triggered when the Primeng dialog finishes its opening animation.
+   * Ensures the chart canvas is correctly sized and triggers data fetching if empty.
+   */
+  onShow(): void {
+    // Wait for dialog animation
+    this.forceChartRefresh(undefined, undefined, 300);
+
+    if (!this.rowsCache.length) {
+      this.load();
+    }
+  }
+
+  private forceChartRefresh(perfStart?: number, perfNetworkEnd?: number, delay = 350): void {
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      this.chart?.refresh();
+      window.dispatchEvent(new Event('resize'));
+
+      if (perfStart && perfNetworkEnd) {
+        const renderEnd = performance.now();
+        const networkTime = perfNetworkEnd - perfStart;
+        const renderTime = renderEnd - perfNetworkEnd;
+        const totalTime = renderEnd - perfStart;
+
+        console.group('[Performance] Station Data Load');
+        console.log(`1. Data Arrival (Network): ${networkTime.toFixed(2)}ms`);
+        console.log(`2. Rendering & UI Update:  ${renderTime.toFixed(2)}ms (Delay: ${delay}ms)`);
+        console.log(`= Total Time:              ${totalTime.toFixed(2)}ms`);
+        console.groupEnd();
+      }
+    }, delay);
+  }
+
+  /**
+   * Toggles the visibility of a specific seasonal or annual period in the charts.
+   * 
+   * @param p - The period identifier (e.g. 'summer', 'annual').
+   */
+  togglePeriod(p: Period): void {
+    if (this.selectedPeriods.includes(p)) {
+      this.selectedPeriods = this.selectedPeriods.filter(x => x !== p);
+    } else {
+      this.selectedPeriods.push(p);
+    }
+
+    const order = ['annual', 'winter', 'spring', 'summer', 'autumn'];
+    this.selectedPeriods.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+    this.recalcRangeForPeriod();
+    this.chartData = this.buildChart(this.rowsCache);
+  }
+
+  onRangeChange(): void {
+    this.currentRange = { start: this.selectedRange[0], end: this.selectedRange[1] };
+    this.chartData = this.buildChart(this.rowsCache);
+  }
+
+  onInputYearChange(): void {
+    this.selectedRange = [this.currentRange.start, this.currentRange.end];
+    this.chartData = this.buildChart(this.rowsCache);
+  }
+
+  onToggleDataset(): void {
+    this.chartData = this.buildChart(this.rowsCache);
+  }
+
+  private recalcRangeForPeriod(): void {
+    if (!this.rowsCache.length) return;
+
+    const validYears = this.rowsCache
+      .filter(r => this.selectedPeriods.includes(r.period) && this.isValidRow(r, r.period))
+      .map(r => r.year);
+
+    if (validYears.length > 0) {
+      this.minYear = Math.min(...validYears);
+      this.maxYear = Math.max(...validYears);
+    } else {
+      this.minYear = 1900;
+      this.maxYear = new Date().getFullYear();
+    }
+
+    if (this.currentRange.start < this.minYear) this.currentRange.start = this.minYear;
+    if (this.currentRange.end > this.maxYear) this.currentRange.end = this.maxYear;
+
+    this.selectedRange = [this.currentRange.start, this.currentRange.end];
+  }
+
+  /**
+   * Fetches the temperature data for the currently selected station ID from the backend.
+   * Updates loading states, caches the response, and triggers a chart rebuild on completion.
+   */
+  load(): void {
+    this.loadSubscription?.unsubscribe();
+
+    if (!this.stationId) return;
+
+    const t0 = performance.now(); // Performance Start
+
+    this.stationName = this.ui.getStationName(this.stationId);
+
+    this.error = null;
+    this.loading = true;
+
+    this.loadSubscription = this.api.getStationTemps(this.stationId).subscribe({
+      next: (rows: TempRow[]) => {
+        const t1 = performance.now(); // Network End
+
+        this.loading = false;
+        this.rowsCache = rows ?? [];
+
+        this.recalcRangeForPeriod();
+
+        this.recalcRangeForPeriod();
+
+        if (this.initialRange) {
+          this.currentRange.start = Math.max(this.minYear, this.initialRange[0]);
+          this.currentRange.end = Math.min(this.maxYear, this.initialRange[1]);
+          this.selectedRange = [this.currentRange.start, this.currentRange.end];
+        } else {
+          this.currentRange.start = this.minYear;
+          this.currentRange.end = this.maxYear;
+          this.selectedRange = [this.currentRange.start, this.currentRange.end];
+        }
+
+        this.chartData = this.buildChart(this.rowsCache);
+        this.forceChartRefresh(t0, t1, 0);
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Could not load temperature data.';
+      },
+    });
+  }
+
+  get tableData(): any[] {
+    const { start, end } = this.currentRange;
+    const yearStart = Math.floor(start);
+    const yearEnd = Math.floor(end);
+
+    const data: any[] = [];
+
+    const rows = (this.rowsCache ?? []).filter(r =>
+      this.selectedPeriods.includes(r.period) &&
+      r.year >= yearStart && r.year <= yearEnd
+    );
+
+    for (const r of rows) {
+      if (this.isValidRow(r, r.period)) {
+        data.push({
+          year: r.year,
+          period: r.period,
+          tmax: r.avg_tmax_c,
+          tmin: r.avg_tmin_c
+        });
+      }
+    }
+
+    const periodOrder = ['annual', 'winter', 'spring', 'summer', 'autumn'];
+    return data.sort((a, b) => {
+      if (b.year !== a.year) return b.year - a.year;
+      return periodOrder.indexOf(a.period) - periodOrder.indexOf(b.period);
+    });
+  }
+
+  private buildChart(rows: TempRow[]) {
+    const { start, end } = this.currentRange;
+    const yearStart = Math.floor(start);
+    const yearEnd = Math.floor(end);
+
+    const datasets: any[] = [];
+    const labels: string[] = [];
+
+    for (let y = yearStart; y <= yearEnd; y++) {
+      labels.push(String(y));
+    }
+
+    let globalHasData = false;
+
+    this.selectedPeriods.forEach(p => {
+      const rowMap = new Map<number, TempRow>();
+      (rows ?? []).forEach((r) => {
+        if (r.period === p) rowMap.set(r.year, r);
+      });
+
+      const tmaxData: (number | null)[] = [];
+      const tminData: (number | null)[] = [];
+
+      for (let y = yearStart; y <= yearEnd; y++) {
+        const row = rowMap.get(y);
+        const valid = row ? this.isValidRow(row, p) : false;
+
+        if (valid && row) {
+          tmaxData.push(row.avg_tmax_c);
+          tminData.push(row.avg_tmin_c);
+          globalHasData = true;
+        } else {
+          tmaxData.push(null);
+          tminData.push(null);
+        }
+      }
+
+      const colors = this.periodColors[p];
+      const labelPrefix = p.charAt(0).toUpperCase() + p.slice(1);
+
+      datasets.push({
+        label: `${labelPrefix} Tmax`,
+        data: tmaxData,
+        borderColor: colors.tmax,
+        backgroundColor: colors.tmax,
+        hidden: !this.showTmax,
+        tension: 0.3,
+        spanGaps: false,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      });
+
+      datasets.push({
+        label: `${labelPrefix} Tmin`,
+        data: tminData,
+        borderColor: colors.tmin,
+        backgroundColor: colors.tmin,
+        hidden: !this.showTmin,
+        tension: 0.3,
+        spanGaps: false,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      });
+    });
+
+    this.hasVisibleData = globalHasData;
+
+    return {
+      labels: labels,
+      datasets: datasets,
+    };
+  }
+
+  private isValidRow(row: TempRow, period: Period): boolean {
+    const minMonths = 1;
+    return row.n_tmax >= minMonths || row.n_tmin >= minMonths;
+  }
+}

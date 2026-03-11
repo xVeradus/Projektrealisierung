@@ -1,0 +1,97 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.map-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.draggable-pin {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: grab;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.pin-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  user-select: none;
+}
+
+.draggable-pin:hover {
+  transform: scale(1.1);
+  background: #f8fafc;
+}
+
+.draggable-pin:active {
+  cursor: grabbing;
+}
+
+.pin-icon {
+  width: 24px;
+  height: 24px;
+  background-color: #ef4444;
+  mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>') no-repeat center;
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>') no-repeat center;
+}
+
+.station-pin .pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #111;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.station-pin:hover .pin {
+  transform: scale(1.4);
+  background-color: #3b82f6;
+  cursor: pointer;
+}
+
+.center-pin .center-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #0b5;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.station-tooltip {
+  background: #1e293b !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.station-tooltip:before {
+  border-top-color: #1e293b !important;
+}

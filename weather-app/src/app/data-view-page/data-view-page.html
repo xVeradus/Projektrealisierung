@@ -1,0 +1,32 @@
+<header class="app-banner">
+  <div class="brand">
+    <div class="brand-text">
+      <h1 class="app-name">Wetterarchiv</h1>
+    </div>
+  </div>
+</header>
+
+<div class="dv">
+  <div class="settings">
+    <app-settings-configuration></app-settings-configuration>
+  </div>
+
+  <div class="map-pane">
+    <app-map-view></app-map-view>
+  </div>
+</div>
+
+<pop-up-display [visible]="ui.dialogVisible()" (visibleChange)="onDialogVisibleChange($event)"
+  [stationId]="ui.selectedStationId()" [initialRange]="ui.yearRange()">
+</pop-up-display>
+
+<footer class="doc-footer">
+  <div class="footer-credits">
+    <i class="pi pi-coffee" style="margin-right: 8px; color: #64748b"></i>
+    Made with lots of coffee and tears by: Lisa Fritsche, Jan Goliasch, Finja Sterner and Menko
+    Hornstein
+  </div>
+  <a href="https://xveradus.github.io/Projektrealisierung/" target="_blank" class="doc-link">
+    <i class="pi pi-book"></i> Doku
+  </a>
+</footer>

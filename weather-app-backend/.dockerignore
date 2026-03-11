@@ -1,0 +1,7 @@
+__pycache__
+venv
+.git
+.vscode
+.env
+weather.sqlite3
+.DS_Store

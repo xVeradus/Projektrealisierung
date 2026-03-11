@@ -1,0 +1,112 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+.app-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  height: 100px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.action-title {
+  font-family: serif;
+  font-style: italic;
+  font-size: 1.125rem;
+  color: #334155;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.dv {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.settings,
+.map-pane {
+  min-height: 0;
+}
+
+.map-pane {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.doc-footer {
+  height: 44px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.footer-credits {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.doc-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.doc-link:hover {
+  color: #4f46e5;
+  background: #f1f5f9;
+}
