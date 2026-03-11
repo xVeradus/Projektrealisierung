@@ -188,7 +188,6 @@ def test_fetch_and_parse_fallback(mock_s3, mock_dly, mock_process):
     
     res = fetch_and_parse_station_periods("STAT1", None, True, 2020, 2020)
     
-    # Should have called s3, failed, then called dly
     mock_s3.assert_called_once()
     mock_dly.assert_called_once()
     mock_process.assert_called_once()

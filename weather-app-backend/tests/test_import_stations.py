@@ -225,7 +225,7 @@ def test_import_stations_batch_commit():
     with patch("builtins.open", mock_open(read_data=start_lines)):
         import_stations(mock_conn, Path("dummy.txt"))
         
-        # Should be called twice (once for 1000, once for 5)
+        # Verify the batch execution count (1000 records + remainder of 5)
         assert mock_conn.cursor.return_value.executemany.call_count == 2
         assert mock_conn.commit.called
 
@@ -276,6 +276,6 @@ def test_test_import_inventory_batching():
     with patch("builtins.open", mock_open(read_data=start_lines)):
         import_inventory(mock_conn, Path("dummy.txt"))
         
-        # Should be called twice (once for 5000, once for 5)
+        # Verify the batch execution count (5000 records + remainder of 5)
         assert mock_conn.cursor.return_value.executemany.call_count == 2
         assert mock_conn.commit.called
