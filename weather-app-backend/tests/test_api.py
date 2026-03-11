@@ -127,23 +127,22 @@ async def test_startup_event_initialization_error():
     """
     Verifies that the application correctly handles and records errors during startup bootstrapping.
     """
-    from app.main import app, startup_event
+    from app.main import app, lifespan
     import asyncio
     
     with patch("app.main.ensure_stations_imported", side_effect=Exception("Boot Failure")):
-        await startup_event()
-        
-        # Await the background task spawned by startup_event
-        pending = asyncio.all_tasks()
-        for task in pending:
-            if task != asyncio.current_task():
-                try:
-                    await task
-                except Exception:
-                    pass
-        
-        assert app.state.stations_ready is False
-        assert app.state.stations_error == "Boot Failure"
+        async with lifespan(app):
+            # Await the background task spawned by startup_event
+            pending = asyncio.all_tasks()
+            for task in pending:
+                if task != asyncio.current_task():
+                    try:
+                        await task
+                    except Exception:
+                        pass
+            
+            assert app.state.stations_ready is False
+            assert app.state.stations_error == "Boot Failure"
 
 def test_require_ready_guard_logic():
     """

@@ -152,7 +152,7 @@ def _load_s3_data(station_id: str, start_year: Optional[int], end_year: Optional
 
     return df[["station_id", "year", "month", "element", "value"]]
 
-def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_year: Optional[int]) -> List[Tuple]:
+def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_year: Optional[int], lat: Optional[float] = None) -> List[Tuple]:
     """Calculates seasonal and annual mean TMAX and TMIN from the daily data DataFrame."""
     if df_v.empty:
         return []
@@ -169,16 +169,37 @@ def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_yea
     # We create a dummy "count" column of 1 for the period logic
     grp_monthly["count"] = 1
 
-    grp_monthly["season"] = grp_monthly["month"].map({
-        3: "spring", 4: "spring", 5: "spring",
-        6: "summer", 7: "summer", 8: "summer",
-        9: "autumn", 10: "autumn", 11: "autumn",
-        12: "winter", 1: "winter", 2: "winter"
-    })
+    # Season mapping depends on hemisphere
+    is_southern = lat is "unknown" or (lat is not None and lat < 0)
+    
+    if is_southern:
+        # Southern Hemisphere seasons
+        season_map = {
+            3: "autumn", 4: "autumn", 5: "autumn",
+            6: "winter", 7: "winter", 8: "winter",
+            9: "spring", 10: "spring", 11: "spring",
+            12: "summer", 1: "summer", 2: "summer"
+        }
+    else:
+        # Northern Hemisphere seasons (default)
+        season_map = {
+            3: "spring", 4: "spring", 5: "spring",
+            6: "summer", 7: "summer", 8: "summer",
+            9: "autumn", 10: "autumn", 11: "autumn",
+            12: "winter", 1: "winter", 2: "winter"
+        }
+
+    grp_monthly["season"] = grp_monthly["month"].map(season_map)
     
     grp_monthly["season_year"] = grp_monthly["year"]
-    # Winter "YYYY" comprises Dec YYYY, Jan YYYY+1, and Feb YYYY+1
-    grp_monthly.loc[grp_monthly["month"].isin([1, 2]), "season_year"] -= 1
+    
+    # "Winter" spans crossing year boundary in Northern Hemisphere (Dec Y, Jan Y+1, Feb Y+1) 
+    # and "Summer" spans crossing year boundary in Southern Hemisphere (Dec Y, Jan Y+1, Feb Y+1)
+    boundary_season = "summer" if is_southern else "winter"
+    
+    mask_cross = grp_monthly["season"] == boundary_season
+    mask_jan_feb = mask_cross & grp_monthly["month"].isin([1, 2])
+    grp_monthly.loc[mask_jan_feb, "season_year"] -= 1
 
     # 2. Annual Aggregation
     grp_annual = grp_monthly.groupby(["station_id", "year", "element"]).agg(
@@ -252,6 +273,7 @@ def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_yea
 
 def fetch_and_parse_station_periods(
     station_id: str,
+    conn: sqlite3.Connection = None,
     ignore_qflag: bool = True,
     start_year: Optional[int] = None,
     end_year: Optional[int] = None,
@@ -262,6 +284,7 @@ def fetch_and_parse_station_periods(
 
     Args:
         station_id: NOAA station identifier.
+        conn: SQLite connection to retrieve station metadata.
         ignore_qflag: If True, ignores data points with quality flags.
         start_year: Start year for data extraction.
         end_year: End year for data extraction.
@@ -269,6 +292,14 @@ def fetch_and_parse_station_periods(
     Returns:
         List of tuples representing aggregated period data.
     """
+    lat = None
+    if conn:
+        try:
+            row = conn.execute("SELECT lat FROM stations WHERE station_id = ?", (station_id,)).fetchone()
+            if row:
+                lat = float(row[0])
+        except Exception as e:
+            print(f"Could not load latitude for {station_id}: {e}")
     
     try:
         start_t = time.time()
@@ -276,7 +307,7 @@ def fetch_and_parse_station_periods(
         if not df.empty:
             elapsed = time.time() - start_t
             print(f"AWS Loading Time: {elapsed:.2f}s", flush=True)
-            return _process_weather_data(df, start_year, end_year)
+            return _process_weather_data(df, start_year, end_year, lat=lat)
         print("S3 data empty, falling back...", flush=True)
     except Exception as e:
         print(f"S3 fetch failed ({e}), falling back to NCEI DLY...", flush=True)
@@ -285,7 +316,7 @@ def fetch_and_parse_station_periods(
     df = _load_dly_data(station_id, start_year, end_year, ignore_qflag)
     elapsed = time.time() - start_t
     print(f"NCEI Loading Time: {elapsed:.2f}s", flush=True)
-    return _process_weather_data(df, start_year, end_year)
+    return _process_weather_data(df, start_year, end_year, lat=lat)
 
 
 def save_station_periods_to_db(conn: sqlite3.Connection, rows: List[Tuple]) -> None:
@@ -310,7 +341,7 @@ def import_station_periods(
 ) -> None:
     """Orchestrates fetching, parsing, and caching temperature data for a station."""
     rows = fetch_and_parse_station_periods(
-        station_id, ignore_qflag, start_year, end_year
+        station_id, conn, ignore_qflag, start_year, end_year
     )
     save_station_periods_to_db(conn, rows)
 

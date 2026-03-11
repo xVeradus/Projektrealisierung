@@ -90,10 +90,31 @@ export class PopUpDisplayComponent implements OnChanges {
         padding: 12,
         cornerRadius: 8,
         displayColors: true,
+        callbacks: {
+          label: function(context: any) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y.toFixed(1) + ' °C';
+            }
+            return label;
+          }
+        }
       },
       crosshair: {
         color: '#64748b',
         width: 1,
+      }
+    },
+    scales: {
+      y: {
+        ticks: {
+          callback: function(value: any) {
+            return Number(value).toFixed(1) + ' °C';
+          }
+        }
       }
     }
   };

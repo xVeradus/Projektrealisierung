@@ -21,18 +21,17 @@ wheels/
 *.egg
 weather.sqlite3
 *.sqlite3
-/data/dly/
-/data/stations.json
-/data/ghcnd-stations.txt
-/data/ghcnd-inventory.txt
+# (Handled by blanket /data/ rule below)
 .env
 .DS_Store
 # Data files
 *.csv.gz
 *.csv
-/data/s3_csv/
-/data/gsom_csv/
+/data/
 
 # Coverage and Temporary Files
 .coverage
 dest.txt
+.pytest_cache/
+test_protocol.txt
+test_temps*.py

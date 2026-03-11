@@ -17,6 +17,7 @@ import sqlite3
 import os
 import time
 import logging
+from contextlib import asynccontextmanager
 
 
 from app.import_stations import ensure_stations_imported
@@ -32,11 +33,8 @@ from app.import_temps import (
     save_station_periods_to_db,
 )
 
-app = FastAPI(title="Weather Data API", version="0.1.0")
-
-# 1. Startup Event Makes sure, that the database is initialized and ready to serve requests
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     app.state.stations_ready = False
     app.state.stations_error = None
     app.state.stations_info = None
@@ -52,6 +50,10 @@ async def startup_event():
             print("[BOOT] error:", repr(e))
 
     asyncio.create_task(_bootstrap())
+    yield
+
+
+app = FastAPI(title="Weather Data API", version="0.1.0", lifespan=lifespan)
 
 # 2. Ready Endpoint Checks if the database is initialized and ready to serve requests
 @app.get("/api/ready")

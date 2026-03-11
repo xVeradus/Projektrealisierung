@@ -96,3 +96,4 @@ nav:
       - Übersicht Testing: testing_doku.md
       - Detailed Report: testing_documentation.md
       - Systemtests: systemtests.md
+      - Testprotokoll: test_protocol.md
