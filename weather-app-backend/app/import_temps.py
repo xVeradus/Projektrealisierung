@@ -170,7 +170,7 @@ def _process_weather_data(df_v: pd.DataFrame, start_year: Optional[int], end_yea
     grp_monthly["count"] = 1
 
     # Season mapping depends on hemisphere
-    is_southern = lat is "unknown" or (lat is not None and lat < 0)
+    is_southern = lat == "unknown" or (lat is not None and lat < 0)
     
     if is_southern:
         # Southern Hemisphere seasons
