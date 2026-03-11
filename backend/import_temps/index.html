@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -714,10 +714,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-data-download_from_ncei-download_from_s3" class="md-nav__link">
+  <a href="#fetch-operations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download Data (download_from_ncei / download_from_s3)
+        Fetch Operations
       
     </span>
   </a>
@@ -725,21 +725,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#load-data-dly-format" class="md-nav__link">
+  <a href="#load-data-_load_s3_data-_load_dly_data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Load Data (.dly Format)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#load-station-data-csv-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Load Station Data (CSV Format)
+        Load Data (_load_s3_data / _load_dly_data)
       
     </span>
   </a>
@@ -1301,18 +1290,13 @@
 
 <h1 id="import_tempspy">import_temps.py<a class="headerlink" href="#import_tempspy" title="Permanent link">&para;</a></h1>
 <h3 id="ablauf">Ablauf<a class="headerlink" href="#ablauf" title="Permanent link">&para;</a></h3>
-<pre class="mermaid"><code>flowchart TD
-    Start([Anfrage: Daten]) --&gt; CheckDB{Daten in DB?}
-    CheckDB -- "Ja (Cache Hit)" --&gt; Return([Return DB Rows])
-    CheckDB -- "Nein (Gap Detect)" --&gt; Fetch[Fetch &amp; Parse Strategy]
-
-    subgraph Fetcher [Tiered Fetching]
-        Fetch --&gt; TryS3
-        TryS3[("Try: AWS S3 (.csv.gz)")] --&gt; S3OK{Success?}
-        S3OK -- Ja --&gt; Process
-        S3OK -- Nein --&gt; TryNCEI
-        TryNCEI[("Fallback: NOAA (.dly)")] --&gt; Process
-    end
+<pre class="mermaid"><code>graph TD;
+        Start((API Call: Get Temps)) --&gt; CheckDB{Data in DB or Range?};
+        CheckDB -- Yes --&gt; Serve[Return from SQLite];
+        CheckDB -- No --&gt; FetchS3[Download NOAA S3 CSV / NCEI DLY];
+        FetchS3 --&gt; Process[Aggregate Daily CSV into Monthly/Seasons using Pandas];
+        Process --&gt; DBStore[Save to DB];
+        DBStore --&gt; Serve;
 
     Process[Pandas Processing] --&gt; Clean[Result: JSON List]
     Clean --&gt; Return
@@ -1320,30 +1304,16 @@
     Process -.-&gt; BgSave[Background: Save to DB]
     BgSave --&gt; Trans[Transaction: Insert/Replace]
     Trans --&gt; Commit[Commit]</code></pre>
-<h3 id="download-data-download_from_ncei-download_from_s3">Download Data (<code>download_from_ncei</code> / <code>download_from_s3</code>)<a class="headerlink" href="#download-data-download_from_ncei-download_from_s3" title="Permanent link">&para;</a></h3>
-<pre><code>Diese Funktionen implementieren die Low-Level-Netzwerklogik für den Datenerwerb.
-
-*   **Effizienz**: Nutzt Stream-Verarbeitung (`stream=True` und `iter_content`), um auch große Dateien speicherschonend herunterzuladen, ohne den gesamten Dateiinhalt in den RAM zu laden.
-*   **Caching**: Prüft vor dem Download via `dest.exists()`, ob die Datei bereits lokal vorliegt ("Don't repeat yourself").
-*   **Dual-Source-Strategie**:
-    *   `download_from_s3`: Der bevorzugte Weg. Lädt vorkomprimierte gzip-CSVs von einem schnellen S3-Cloud-Speicher (optimiert für Bulk-Zugriffe).
-    *   `download_from_ncei`: Der Fallback-Weg. Lädt die operativen `.dly`-Dateien direkt von den NOAA-Regierungsservern, falls S3 nicht erreichbar oder veraltet ist.
+<h3 id="fetch-operations">Fetch Operations<a class="headerlink" href="#fetch-operations" title="Permanent link">&para;</a></h3>
+<p>Die Pipeline beginnt bei der Feststellung eines Cache-Miss.</p>
+<pre><code>*   `download_from_s3`: Bezieht die komprimierten **Daily Summaries** (`.csv.gz`) von den AWS S3 Servern der NOAA. Das ist die priorisierte und schnellste API.
+*   `download_from_ncei`: Dient als Fallback, falls S3 fehlschlägt. Bezieht gigantische Textdateien (`.dly`) mit historischen Werten in Fixed-Width-Format direkt vom NOAA NCEI Archiv.
 </code></pre>
-<h3 id="load-data-dly-format">Load Data (.dly Format)<a class="headerlink" href="#load-data-dly-format" title="Permanent link">&para;</a></h3>
-<pre><code>Der Parser für das klassische, komplexe **NOAA GHCN-Daily Format** (`.dly`).
-
-*   **Format-Handling**: Dieses Format ist "Fixed-Width" (feste Spaltenbreiten) und extrem kompakt, aber schwer zu lesen. Jede Zeile enthält die Messwerte eines ganzen Monats (31 Tage).
-*   **Pandas**: Nutzt `pd.read_fwf` mit exakt definierten `colspecs` (Spaltenpositionen), um die Struktur korrekt zu interpretieren.
-*   **Transformation**: Da das Ausgangsformat "breit" ist (Spalten v1..v31), nutzt die Funktion `pd.melt`, um es in ein modernes "Long-Format" (eine Zeile pro Tag: Datum, Wert) zu pivotieren. Das ist essenziell für die weitere Zeitreihenanalyse.
-*   **Qualitätssicherung**: Filtert Datenpunkte anhand der "Quality Flags" (`qflag`). Wenn `ignore_qflag=True` gesetzt ist, werden nur validierte Messwerte akzeptiert.
-</code></pre>
-<h3 id="load-station-data-csv-format">Load Station Data (CSV Format)<a class="headerlink" href="#load-station-data-csv-format" title="Permanent link">&para;</a></h3>
-<pre><code>Der Parser für das moderne, optimierte **CSV-Format** aus dem S3-Bucket.
-
-*   **High-Performance**: Im Gegensatz zum DLY-Format ist dieses CSV bereits im "Long-Format".
-*   **Ressourcen-Schonung**: Nutzt `usecols`, um nur die zwingend benötigten Spalten (ID, Datum, Element, Wert) einzulesen. Das spart massiv Arbeitsspeicher, da irrelevante Metadaten direkt beim Einlesen verworfen werden.
-*   **Robustheit**: Enthält Logik, um korrupte Downloads (z.B. 0-Byte-Dateien nach Abbruch) zu erkennen, zu löschen und beim nächsten Mal sauber neu zu laden.
-*   **Vorfilterung**: Filtert schon beim Laden nach Jahren (`start_year`, `end_year`) und Elementen (`TMAX`, `TMIN`), um den DataFrame so klein wie möglich zu halten.
+<h3 id="load-data-_load_s3_data-_load_dly_data">Load Data (<code>_load_s3_data</code> / <code>_load_dly_data</code>)<a class="headerlink" href="#load-data-_load_s3_data-_load_dly_data" title="Permanent link">&para;</a></h3>
+<pre><code>Der Parser abstrahiert das Format-Chaos der NOAA:
+*   DLY: Zerschneidet die 31-Wert Spalten (`v1`, `v2`, ... `v31`) in ein nutzbares Array und schmilzt sie per Pandas `melt` zusammen.
+*   S3: Gliedert die sauberen Spalten und Datumsangaben.
+*   Beide Loads schneiden fehlerhafte Einträge via QA Flags (`qflag`) heraus, sortieren falsche IDs aus und ignorieren Messfehler (`-9999`).
 </code></pre>
 <h3 id="process-data-_process_weather_data">Process Data (<code>_process_weather_data</code>)<a class="headerlink" href="#process-data-_process_weather_data" title="Permanent link">&para;</a></h3>
 <pre><code>Das "Gehirn" der Datenverarbeitung. Hier werden Rohdaten in nutzbare Statistiken verwandelt.
@@ -1351,7 +1321,8 @@
 *   **Einheiten-Konvertierung**: Wandelt die NOAA-interne Speicherung (Zehntel-Grad Celsius) in menschenlesbare Grad Celsius um (`/ 10.0`).
 *   **Meteorologische Logik**: Ordnet Monate den korrekten Jahreszeiten zu (z.B. Dezember = Winter).
     *   *Besonderheit*: Der meteorologische Winter erstreckt sich über den Jahreswechsel (Dezember eines Jahres gehört zum Winter des *nächsten* Jahres). Diese komplexe Logik wird hier korrekt abgebildet (`season_year`).
-*   **Aggregation**: Nutzt die enorme Geschwindigkeit von Pandas `groupby`-Operationen, um Tausende Tageswerte in Sekundenbruchteilen zu aggregieren:
+*   **Tages-zu-Monats Aggregation**: Die frisch bezogenen Tageswerte werden _zunächst_ auf einen Monat aggregiert. Das ist immens wichtig, damit ein einzelner fehlender Messtag das aggregierte Durchschnittsjahr später nicht hart verfälscht.
+*   **Aggregation der Perioden**: Nutzt die Geschwindigkeit von Pandas `groupby`, um die errechneten Monate weiter zusammenzufassen:
     *   `annual`: Berechnet Jahresdurchschnitte.
     *   `seasonal`: Berechnet Durchschnittswerte pro Jahreszeit.
 *   **Data Cleaning**: Stellt sicher, dass das Ergebnis JSON-konform ist (ersetzt `NaN` durch `None`) und garantiert eine konsistente Struktur für das Frontend, selbst wenn Daten für bestimmte Perioden fehlen.

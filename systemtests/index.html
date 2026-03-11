@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -1820,7 +1820,7 @@
 <h2 id="5-testdatenbasis">5. Testdatenbasis<a class="headerlink" href="#5-testdatenbasis" title="Permanent link">&para;</a></h2>
 <h3 id="51-referenzdaten">5.1 Referenzdaten<a class="headerlink" href="#51-referenzdaten" title="Permanent link">&para;</a></h3>
 <p><strong>Grundlage der erwarteten Werte (Verifizierung):</strong>
-Die Erwartungswerte für die Stationstreffer und die Temperaturaggregationen wurden <em>unabhängig</em> von unserer eigenen Backend-Anwendung validiert. Dafür wurden die offiziellen Datensätze der NOAA (National Centers for Environmental Information) über deren Web-Interface <code>https://www.ncei.noaa.gov/</code> und raw <code>.csv/.dly</code>-Dumps für die jeweiligen Test-Jahre heruntergeladen und stichprobenartig die Durchschnittswerte berechnet. </p>
+Die Erwartungswerte für die Stationstreffer und die Temperaturaggregationen wurden <em>unabhängig</em> von unserer eigenen Backend-Anwendung validiert. Dafür wurden die offiziellen Datensätze der NOAA (National Centers for Environmental Information) über deren Web-Interface <code>https://www.ncei.noaa.gov/</code> und raw <code>.csv</code> S3-Dumps für die jeweiligen Test-Jahre heruntergeladen und stichprobenartig die Durchschnittswerte berechnet. </p>
 <p>Die Erwartungswerte für die <strong>Distanzberechnung</strong> zwischen gesuchtem Punkt und gefundener Wetterstation (Haversine-Formel) wurden vorab mit dem offiziellen "Entfernungs-Messwerkzeug" von Google Maps zwischen den gesuchten Koordinaten und den amtlichen Stationskoordinaten validiert.</p>
 <table>
 <thead>
@@ -1838,7 +1838,7 @@ Die Erwartungswerte für die Stationstreffer und die Temperaturaggregationen wur
 </tr>
 <tr>
 <td style="text-align: left;"><strong>R2</strong></td>
-<td style="text-align: left;">Manuelle Stichproben raw <code>.dly</code> und <code>.csv</code> Jahresdateien</td>
+<td style="text-align: left;">Manuelle Stichproben raw S3/DLY <code>.csv</code> Jahresdateien</td>
 <td style="text-align: left;">NOAA NCEI Daily Summaries</td>
 </tr>
 <tr>

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -1137,6 +1137,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="3. Klimadaten-Verarbeitung (test_import_temps.py)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pandas-dataframe-loading-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pandas DataFrame Loading Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1243,12 +1260,15 @@ Erfolgreiche Tests: <strong>40</strong></p>
 <h2 id="3-klimadaten-verarbeitung-test_import_tempspy">3. Klimadaten-Verarbeitung (<code>test_import_temps.py</code>)<a class="headerlink" href="#3-klimadaten-verarbeitung-test_import_tempspy" title="Permanent link">&para;</a></h2>
 <p>Tests für die Extraktion, Transformation und Aggregation der eigentlichen Temperatur-Daten mittels Pandas.</p>
 <ul>
-<li><code>test_download_from_ncei_success</code> &amp; <code>test_download_from_s3_success</code>: Verifikation der Datei-Downloads für DLY-Txt- Dateien und GZ-Archivdateien (Mocking von HTTP-Übertragungen).</li>
+<li><code>test_download_s3_csv_success</code>: Verifikation der Datei-Downloads für die komprimierten S3 CSV-Dateien (Mocking von HTTP-Übertragungen).</li>
 <li><code>test_download_skips_existing</code>: Validiert, dass zwischengespeicherte Dateien auf der lokalen Festplatte redundante Downloads smart überspringen.</li>
-<li><code>test_load_dly_data_success</code> &amp; <code>test_load_s3_data_success</code>: Verifiziert, dass rohe NOAA-Texte korrekt durch Pandas gelesen, geparst und gefiltert werden (TMAX / TMIN).</li>
-<li><code>test_process_weather_data_aggregation</code>: <strong>Kern-Test der Business Logik!</strong> Prüft die Aggregation durch Pandas (Durchschnittswerte, Aufteilung nach Jahreszeiten/Annual).</li>
+</ul>
+<h3 id="pandas-dataframe-loading-tests">Pandas DataFrame Loading Tests<a class="headerlink" href="#pandas-dataframe-loading-tests" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>test_load_s3_data_success</code>: Verifiziert, dass rohe AWS S3-Daten korrekt durch Pandas gelesen, geparst und gefiltert werden.</li>
+<li><code>test_process_weather_data_aggregation</code>: <strong>Kern-Test der Business Logik!</strong> Prüft die Aggregation durch Pandas (Tagesdaten -&gt; Monatsdurchschnitte -&gt; Aufteilung nach Jahreszeiten/Annual).</li>
 <li><code>test_process_weather_data_json_compliance</code>: Sichert ab, dass "Not-a-Number"-Werte (NaN) und Unendlichkeits-Fehler von Numpy vor der API JSON-Übergabe entfernt werden.</li>
-<li><code>test_fetch_and_parse_fallback_to_ncei</code>: Prüft die redundante Failover-Logik von schnellen AWS S3 Buckets auf das langsamere NCEI Backup-Archiv.</li>
+<li><code>test_fetch_and_parse_success</code>: Prüft die redundante Failover-Logik von schnellen AWS S3 Buckets auf das langsamere NCEI Backup-Archiv.</li>
 <li><code>test_ensure_station_periods_range</code>: Testet das intelligente Laden von spezifischen Jahres-Spannen (<code>start_year</code> bis <code>end_year</code>).</li>
 </ul>
 <h2 id="4-geometrie-geo-suche-test_stations_searchpy">4. Geometrie &amp; Geo-Suche (<code>test_stations_search.py</code>)<a class="headerlink" href="#4-geometrie-geo-suche-test_stations_searchpy" title="Permanent link">&para;</a></h2>
