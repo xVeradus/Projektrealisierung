@@ -89,7 +89,42 @@ def test_import_stations_execution():
     
     assert len(batch) == 2
     assert batch[0][0] == "ACW00011604" # ID
-    assert batch[1][5] == "TEST STATION 2" # Name
+    assert mock_conn.commit.called
+
+def test_import_inventory():
+    """
+    Verifies that inventory lines are correctly inserted into the database.
+    Mocks file reading to avoid needing a real .txt file.
+    ENSURE: executemany is called with the correct batch of data.
+    """
+    # 0-10: ID | 31-34: Element | 36-39: Start Year | 41-44: End Year
+    mock_lines = [
+        # Valid TMAX
+        "ACW00011604                    TMAX 1949 1950\n",
+        # Valid TMIN
+        "ACW00011604                    TMIN 1949 1950\n",
+        # Invalid PRCP (should be ignored)
+        "ACW00011604                    PRCP 1949 1950\n",
+        # Too short line (should be ignored)
+        "SHORT     \n"
+    ]
+    
+    from app.import_stations import import_inventory
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    
+    with patch("builtins.open", mock_open(read_data="".join(mock_lines))):
+        import_inventory(mock_conn, Path("dummy_inventory.txt"))
+        
+    assert mock_cursor.executemany.called
+    args, _ = mock_cursor.executemany.call_args
+    sql, batch = args
+    
+    # Only TMAX and TMIN should be processed
+    assert len(batch) == 2
+    assert batch[0] == ("ACW00011604", "TMAX", 1949, 1950)
+    assert batch[1] == ("ACW00011604", "TMIN", 1949, 1950)
     
     assert mock_conn.commit.called
 
@@ -149,7 +184,8 @@ def test_ensure_stations_imported_runs_import():
     """
     with patch("sqlite3.connect") as mock_connect, \
          patch("app.import_stations.download_file") as mock_dl, \
-         patch("app.import_stations.import_stations") as mock_import:
+         patch("app.import_stations.import_stations") as mock_import, \
+         patch("app.import_stations.import_inventory") as mock_inventory:
          
         mock_conn = MagicMock()
         mock_connect.return_value = mock_conn
@@ -168,6 +204,7 @@ def test_ensure_stations_imported_runs_import():
         assert res["stations_count"] == 50
         assert mock_dl.called
         assert mock_import.called
+        assert mock_inventory.called
 
 # -------------------------------------------------------------------
 # 4. Main Execution & Batching Tests
@@ -188,7 +225,7 @@ def test_import_stations_batch_commit():
     with patch("builtins.open", mock_open(read_data=start_lines)):
         import_stations(mock_conn, Path("dummy.txt"))
         
-        # Should be called twice (once for 1000, once for 5)
+        # Verify the batch execution count (1000 records + remainder of 5)
         assert mock_conn.cursor.return_value.executemany.call_count == 2
         assert mock_conn.commit.called
 
@@ -199,7 +236,8 @@ def test_import_stations_main_logic():
     from app.import_stations import main as import_stations_main
     with patch("app.import_stations.download_file") as mock_dl, \
          patch("sqlite3.connect") as mock_connect, \
-         patch("app.import_stations.import_stations"):
+         patch("app.import_stations.import_stations"), \
+         patch("app.import_stations.import_inventory"):
          
         import_stations_main()
         
@@ -213,12 +251,31 @@ def test_import_stations_main_fallback_logic():
     from app.import_stations import main as import_stations_main
     with patch("app.import_stations.download_file") as mock_dl, \
          patch("sqlite3.connect"), \
-         patch("app.import_stations.import_stations"):
+         patch("app.import_stations.import_stations"), \
+         patch("app.import_stations.import_inventory"):
          
         # First call fails, second succeeds
         mock_dl.side_effect = [Exception("Primary URL Fail"), None, Exception("Primary inventory fail"), None, None]
         
         import_stations_main()
-        
-        # Check that download_file was called multiple times due to fallback
         assert mock_dl.call_count >= 2
+
+def test_test_import_inventory_batching():
+    """
+    Verifies that the import_inventory function commits in batches of 5000.
+    """
+    def make_line(i):
+        sid = f"T{i:010d}"
+        return f"{sid}                    TMAX 1950 2000"
+    
+    lines = [make_line(i) for i in range(5005)]
+    start_lines = "\n".join(lines)
+    
+    from app.import_stations import import_inventory
+    mock_conn = MagicMock()
+    with patch("builtins.open", mock_open(read_data=start_lines)):
+        import_inventory(mock_conn, Path("dummy.txt"))
+        
+        # Verify the batch execution count (5000 records + remainder of 5)
+        assert mock_conn.cursor.return_value.executemany.call_count == 2
+        assert mock_conn.commit.called

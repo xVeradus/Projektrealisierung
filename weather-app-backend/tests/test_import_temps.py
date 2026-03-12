@@ -14,7 +14,9 @@ from app.import_temps import (
     _years_to_blocks,
     ensure_station_periods_range,
     get_station_periods,
-    create_schema
+    create_schema,
+    download_from_ncei,
+    _load_dly_data
 )
 
 # ---------------------------------------------------------
@@ -31,6 +33,20 @@ def test_download_s3_csv_success(mock_open_file, mock_get, tmp_path):
     mock_get.return_value.__enter__.return_value = mock_resp
     
     download_from_s3("STAT1", dest)
+    
+    mock_get.assert_called_once()
+    assert dest.parent.exists()
+
+@patch("requests.get")
+@patch("builtins.open")
+def test_download_ncei_success(mock_open_file, mock_get, tmp_path):
+    dest = tmp_path / "test.dly"
+    
+    mock_resp = MagicMock()
+    mock_resp.iter_content.return_value = [b"chunk"]
+    mock_get.return_value.__enter__.return_value = mock_resp
+    
+    download_from_ncei("STAT1", dest)
     
     mock_get.assert_called_once()
     assert dest.parent.exists()
@@ -58,6 +74,43 @@ def test_load_s3_data_success(mock_read_csv, mock_download):
     assert "element" in res.columns
     assert "value" in res.columns
     assert res.iloc[0]["value"] == 250.0
+
+@patch("app.import_temps.download_from_ncei")
+@patch("pandas.read_fwf")
+def test_load_dly_data_success(mock_read_fwf, mock_download):
+    df = pd.DataFrame({
+        "station_id": ["STAT1"],
+        "year": [2020],
+        "month": [1],
+        "element": ["TMAX"],
+        "v1": [250.0],
+        "q1": [None]
+    })
+    # Add dummy columns for v2-v31 and q2-q31
+    for i in range(2, 32):
+        df[f"v{i}"] = [-9999.0]
+        df[f"q{i}"] = [None]
+        
+    mock_read_fwf.return_value = df
+    
+    res = _load_dly_data("STAT1", start_year=2020, end_year=2020, ignore_qflag=True)
+    
+    assert not res.empty
+    assert "element" in res.columns
+    assert "value" in res.columns
+    assert res.iloc[0]["value"] == 250.0
+
+@patch("app.import_temps.download_from_s3")
+def test_load_s3_data_download_fail(mock_download):
+    mock_download.side_effect = Exception("Download failed")
+    with pytest.raises(Exception):
+        _load_s3_data("STAT1", 2020, 2020, True)
+
+@patch("app.import_temps.download_from_ncei")
+def test_load_dly_data_download_fail(mock_download):
+    mock_download.side_effect = Exception("Download failed")
+    res = _load_dly_data("STAT1", 2020, 2020, True)
+    assert res.empty
 
 # ---------------------------------------------------------
 # 3. Processing Data (Aggregation)
@@ -123,6 +176,38 @@ def test_fetch_and_parse_success(mock_s3, mock_process):
     assert len(res) == 1
     mock_s3.assert_called_once()
     mock_process.assert_called_once()
+
+@patch("app.import_temps._process_weather_data")
+@patch("app.import_temps._load_dly_data")
+@patch("app.import_temps._load_s3_data")
+def test_fetch_and_parse_fallback(mock_s3, mock_dly, mock_process):
+    # Simulate S3 failing
+    mock_s3.side_effect = Exception("S3 Error")
+    mock_dly.return_value = pd.DataFrame({"col": [2]})
+    mock_process.return_value = [("STAT1", 2020, "annual", 10.0, 5.0, 1, 1)]
+    
+    res = fetch_and_parse_station_periods("STAT1", None, True, 2020, 2020)
+    
+    mock_s3.assert_called_once()
+    mock_dly.assert_called_once()
+    mock_process.assert_called_once()
+    assert len(res) == 1
+
+@patch("app.import_temps._process_weather_data")
+@patch("app.import_temps._load_dly_data")
+@patch("app.import_temps._load_s3_data")
+def test_fetch_and_parse_empty_s3(mock_s3, mock_dly, mock_process):
+    # Simulate S3 returning empty DataFrame
+    mock_s3.return_value = pd.DataFrame()
+    mock_dly.return_value = pd.DataFrame({"col": [3]})
+    mock_process.return_value = [("STAT1", 2020, "annual", 12.0, 6.0, 1, 1)]
+    
+    res = fetch_and_parse_station_periods("STAT1")
+    
+    mock_s3.assert_called_once()
+    mock_dly.assert_called_once()
+    mock_process.assert_called_once()
+    assert len(res) == 1
 
 # ---------------------------------------------------------
 # 5. DB & Blocks
